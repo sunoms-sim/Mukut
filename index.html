@@ -1,1090 +1,344 @@
-import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mukut - Purchase Orders</title>
+    <style>
+      :root {
+        --primary-6: #4f5dff;
+        --primary-5: #6f7bff;
+        --primary-4: #8f99ff;
+        --primary-2: rgba(79, 93, 255, 0.2);
+        --bg-1: #ffffff;
+        --bg-6: #f0f1f3;
+        --bg-7: #e8eaed;
+        --bg-8: #e0e3e7;
+        --text-2: #a4abb3;
+        --text-4: #6b7280;
+        --text-5: #777777;
+        --text-6: #4a4a4a;
+        --text-7: #0d0d0d;
+        --line-3: rgba(203, 213, 225, 0.4);
+        --line-4: #cbd5e1;
+        --line-5: #d9d9d9;
+        --line-6: #cdcdcd;
+        --success-6: #16a34a;
+        --success-1: rgba(22, 163, 74, 0.1);
+        --warning-6: #f59e0b;
+        --warning-1: rgba(245, 158, 11, 0.1);
+        --danger-6: #dc2626;
+        --danger-1: rgba(220, 38, 38, 0.1);
+        --info-6: #0284c7;
+        --info-1: rgba(2, 132, 199, 0.1);
+      }
 
-/* ---------------------------------------------------------
-   Purchase Orders — implemented 1:1 from Figma
-   File: Update ERP  •  Node 1220:5455
-   Colors, spacing, type sizes match the design tokens exactly.
---------------------------------------------------------- */
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; font-family: Inter, "Segoe UI", sans-serif; background: var(--bg-6); color: var(--text-7); }
+      body { min-height: 100vh; }
+      button { font: inherit; border: none; background: transparent; cursor: pointer; }
 
-const C = {
-  primary6: "#4f5dff",
-  primary5: "#6f7bff",
-  primary4: "#8f99ff",
-  primary2: "rgba(79,93,255,0.2)",
-  bg1: "#ffffff",
-  bg6: "#f0f1f3",
-  bg7: "#e8eaed",
-  bg8: "#e0e3e7",
-  text2: "#a4abb3",
-  text4: "#6b7280",
-  text5: "#777777",
-  text6: "#4a4a4a",
-  text7: "#0d0d0d",
-  line3: "rgba(203,213,225,0.4)",
-  line4: "#cbd5e1",
-  line5: "#d9d9d9",
-  line6: "#cdcdcd",
-  success6: "#16a34a",
-  success1: "rgba(22,163,74,0.1)",
-  warning6: "#f59e0b",
-  warning1: "rgba(245,158,11,0.1)",
-  danger6: "#dc2626",
-  danger1: "rgba(220,38,38,0.1)",
-  info6: "#0284c7",
-  info1: "rgba(2,132,199,0.1)",
-};
+      .app-shell { display: flex; flex-direction: column; height: 100vh; width: 100%; gap: 4px; background: var(--bg-6); }
+      .topbar { display: flex; align-items: center; justify-content: space-between; height: 56px; background: var(--bg-1); padding: 0 8px; border-radius: 4px; }
+      .brand-section { display: flex; align-items: center; min-width: 0; }
+      .brand-name { width: 220px; font-size: 16px; font-weight: 600; color: var(--text-6); letter-spacing: 0.16px; }
+      .branch-tag { display: flex; align-items: center; gap: 10px; border-left: 1px solid var(--line-5); border-right: 1px solid var(--line-5); padding: 0 14px; white-space: nowrap; }
+      .branch-tag strong { font-size: 15px; font-weight: 500; color: var(--text-7); }
+      .branch-tag span { font-size: 13px; color: var(--text-5); letter-spacing: 0.13px; }
+      .search-box { width: min(520px, 100%); display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 4px; background: var(--bg-6); color: var(--text-4); }
+      .search-box span { font-size: 15px; letter-spacing: 0.15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; width: 403px; }
+      .icon-button, .nav-item-header, .primary-button, .more-button, .filter-button, .page-chip, .page-arrow, .assistant-button, .side-collapse-button, .section-button, .view-button, .more-button-small, .status-card, .profile-button, .submenu-item, .nav-item { transition: background-color 180ms ease, border-color 180ms ease, opacity 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+      .icon-button { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 4px; }
+      .icon-button:hover, .nav-item-header:hover, .primary-button:hover, .more-button:hover, .filter-button:hover, .page-chip:hover, .page-arrow:hover, .assistant-button:hover, .side-collapse-button:hover, .section-button:hover, .view-button:hover, .more-button-small:hover { background: var(--bg-6); }
+      .profile-button { display: flex; align-items: center; gap: 8px; padding: 2px 8px 2px 4px; border-radius: 4px; }
+      .profile-button:hover { background: var(--bg-6); }
+      .profile-meta { display: flex; flex-direction: column; text-align: left; }
+      .profile-meta strong { font-size: 14px; color: var(--text-6); letter-spacing: 0.28px; }
+      .profile-meta span { font-size: 12px; color: var(--text-4); letter-spacing: 0.12px; }
 
-/* ---------------- icons (inline, minimal) ---------------- */
-const Icon = {
-  Plus: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  ),
-  ChevronDown: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  MoreDots: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <circle cx="3" cy="7" r="1.3" fill="currentColor" />
-      <circle cx="7" cy="7" r="1.3" fill="currentColor" />
-      <circle cx="11" cy="7" r="1.3" fill="currentColor" />
-    </svg>
-  ),
-  Filter: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M1 2h12l-4.5 5.5V12L6.5 13V7.5z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-    </svg>
-  ),
-  Sort: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M3 3v8M3 3L1 5M3 3l2 2M11 11V3M11 11l2-2M11 11l-2-2" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  Columns: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M5 1v12M9 1v12" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  ),
-  Search: (p) => (
-    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.4" fill="none" />
-      <path d="M12.5 12.5L17 17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  ),
-  Bell: (p) => (
-    <svg viewBox="0 0 20 20" width="20" height="20" {...p}>
-      <path
-        d="M10 2a5 5 0 00-5 5v2.5c0 .8-.3 1.6-.9 2.2L3 13h14l-1.1-1.3a3 3 0 01-.9-2.2V7a5 5 0 00-5-5z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        fill="none"
-        strokeLinejoin="round"
-      />
-      <path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.3" fill="none" />
-    </svg>
-  ),
-  Settings: (p) => (
-    <svg viewBox="0 0 20 20" width="20" height="20" {...p}>
-      <path
-        d="M8.2 2.5h3.6l.4 1.9c.4.15.77.34 1.12.57l1.83-.63 1.8 3.12-1.46 1.28c.03.2.05.4.05.61s-.02.41-.05.61l1.46 1.28-1.8 3.12-1.83-.63c-.35.23-.72.42-1.12.57l-.4 1.9H8.2l-.4-1.9a5.9 5.9 0 01-1.12-.57l-1.83.63-1.8-3.12 1.46-1.28A4.9 4.9 0 014.46 10c0-.21.02-.41.05-.61L3.05 8.11l1.8-3.12 1.83.63c.35-.23.72-.42 1.12-.57z"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        fill="none"
-        strokeLinejoin="round"
-      />
-      <circle cx="10" cy="10" r="2.4" stroke="currentColor" strokeWidth="1.15" fill="none" />
-    </svg>
-  ),
-  User: (p) => (
-    <svg viewBox="0 0 20 20" width="20" height="20" {...p}>
-      <circle cx="10" cy="7" r="3.2" stroke="currentColor" strokeWidth="1.3" fill="none" />
-      <path d="M3.5 17c1-3 4-4.5 6.5-4.5s5.5 1.5 6.5 4.5" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-    </svg>
-  ),
-  Home: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <path d="M2 8l6-5 6 5v6a1 1 0 01-1 1H3a1 1 0 01-1-1z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-    </svg>
-  ),
-  Report: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M5 10V7M8 10V5M11 10V8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  ),
-  Procurement: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <path d="M2 4h12M4 4v9a1 1 0 001 1h6a1 1 0 001-1V4M6 4V2h4v2" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-    </svg>
-  ),
-  Sales: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <path d="M2 13l4-4 3 3 5-6" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  Receivable: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M4 7h8M4 10h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  ),
-  Payable: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M8 5v6M6 10c0 1 .9 1.5 2 1.5s2-.5 2-1.4c0-.9-.7-1.2-2-1.5S6 8 6 7c0-.9.9-1.4 2-1.4s1.8.4 2 1.2" stroke="currentColor" strokeWidth="1" fill="none" strokeLinecap="round" />
-    </svg>
-  ),
-  Accounting: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <path d="M8 1v2M8 13v2M2 8h2M12 8h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <circle cx="8" cy="8" r="4.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-    </svg>
-  ),
-  Tax: (p) => (
-    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
-      <path d="M3 3h10v10H3z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-      <path d="M5 11L11 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  ),
-  Star: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" stroke="currentColor" strokeWidth="1" fill="none" strokeLinejoin="round" />
-    </svg>
-  ),
-  Grid: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-    </svg>
-  ),
-  ChevronLeft: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  ChevronRight: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  CollapseArrow: (p) => (
-    <svg viewBox="0 0 22 22" width="22" height="22" {...p}>
-      <path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  ChartPie: (p) => (
-    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <path d="M9 2a7 7 0 107 7H9z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-      <path d="M9 2v7" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  ),
-  Journal: (p) => (
-    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <rect x="3" y="2" width="12" height="14" rx="1.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-    </svg>
-  ),
-  Info: (p) => (
-    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M9 8v5M9 5.5v.01" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  ),
-};
+      .workspace { display: flex; flex: 1; align-items: stretch; gap: 8px; overflow: hidden; width: 100%; max-width: none; margin: 0; }
+      .sidebar { display: flex; flex-direction: column; width: 220px; min-width: 220px; background: var(--bg-1); overflow: hidden; transition: width 320ms ease; }
+      .sidebar.collapsed { width: 48px; }
+      .sidebar-panels { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+      .sidebar-panel { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; scrollbar-width: none; transition: opacity 260ms ease, pointer-events 260ms ease; }
+      .sidebar-panel::-webkit-scrollbar { display: none; }
+      .sidebar-panel.hidden { opacity: 0; pointer-events: none; }
+      .group { display: flex; flex-direction: column; gap: 8px; padding: 8px 8px 2px; }
+      .group-header { display: flex; align-items: center; gap: 8px; padding: 8px 2px; opacity: 0.8; color: var(--text-4); }
+      .group-header .label { font-size: 11px; font-weight: 700; letter-spacing: 0.44px; text-transform: uppercase; color: var(--text-4); }
+      .nav-stack { display: flex; flex-direction: column; gap: 4px; }
+      .nav-item { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+      .nav-item-header { display: flex; align-items: center; width: 100%; border-radius: 4px; padding: 10px 12px; }
+      .nav-item-header:hover { background: var(--bg-6); box-shadow: inset 0 0 0 1px rgba(79, 93, 255, 0.08); }
+      .nav-item-header.active { background: var(--bg-6); }
+      .nav-item-header.active:hover { background: #edf0ff; }
+      .nav-item-header .nav-icon-wrap { display: flex; align-items: center; justify-content: center; width: 16px; min-width: 16px; margin-right: 12px; overflow: hidden; transition: width 450ms ease, margin 450ms ease, opacity 350ms ease; opacity: 1; color: var(--primary-6); }
+      .nav-item-header.active .nav-icon-wrap { width: 0; margin-right: 0; opacity: 0; }
+      .nav-item-header .label { flex: 1; text-align: left; font-size: 15px; color: var(--text-6); letter-spacing: 0.15px; }
+      .nav-item-header.active .label { color: var(--text-7); }
+      .nav-item-header .chevron { display: inline-flex; align-items: center; justify-content: center; color: var(--text-6); opacity: 0; transition: transform 400ms ease, opacity 350ms ease; }
+      .nav-item-header.open .chevron { opacity: 1; transform: rotate(180deg); }
+      .submenu { display: flex; flex-direction: column; gap: 2px; padding-left: 42px; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 450ms ease, opacity 400ms ease; }
+      .nav-item.open .submenu { opacity: 1; max-height: 200px; }
+      .submenu-item { display: flex; align-items: center; border-left: 4px solid transparent; border-radius: 0 8px 8px 0; min-height: 32px; }
+      .submenu-item:hover { background: var(--bg-6); transform: translateX(2px); }
+      .submenu-item.active { background: var(--primary-2); border-color: var(--primary-4); }
+      .submenu-item .item-text { flex: 1; text-align: left; padding: 8px 0 8px 10px; font-size: 13px; color: var(--text-6); }
+      .submenu-item.active .item-text { color: var(--text-7); font-weight: 500; }
+      .add-button { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 4px; opacity: 0; margin-right: 4px; color: var(--primary-6); }
+      .submenu-item:hover .add-button, .submenu-item.active .add-button { opacity: 1; }
+      .submenu-item:hover { background: var(--bg-6); }
+      .submenu-item.active:hover { background: rgba(79, 93, 255, 0.18); }
+      .sidebar-footer { position: relative; flex-shrink: 0; height: 56px; }
+      .expand-box, .collapse-box { position: absolute; inset: 8px; display: flex; align-items: center; justify-content: center; transition: opacity 260ms ease, pointer-events 260ms ease; }
+      .expand-box.hidden, .collapse-box.hidden { opacity: 0; pointer-events: none; }
+      .personalization { display: flex; align-items: center; gap: 8px; width: 100%; background: var(--bg-6); border-radius: 4px; padding: 16px 12px; height: 40px; }
+      .personalization span { font-size: 12px; color: var(--text-5); letter-spacing: 0.12px; }
+      .side-collapse-button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 4px; background: var(--bg-1); border: 1px solid var(--line-4); }
+      .assistant { width: 56px; min-width: 56px; background: var(--bg-1); display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-left: auto; }
+      .assistant-header { padding: 8px 0; }
+      .assistant-actions { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
+      .assistant-button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 4px; }
+      .content { display: flex; flex: 1 1 auto; flex-direction: column; gap: 8px; overflow: auto; padding: 0; background: var(--bg-6); max-width: none; min-width: 0; width: 100%; }
+      .page-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 10px; }
+      .page-header h1 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-7); }
+      .page-header-actions { display: flex; align-items: center; gap: 12px; }
+      .more-button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--primary-5); }
+      .more-button span { font-size: 14px; font-weight: 700; color: var(--primary-6); }
+      .primary-button { display: inline-flex; align-items: center; gap: 4px; background: var(--primary-6); color: white; border: 1px solid var(--primary-6); border-radius: 4px; padding: 8px 10px; font-size: 14px; font-weight: 700; }
+      .status-strip { display: flex; align-items: stretch; gap: 8px; }
+      .status-card { width: 260px; padding: 12px 16px; border-radius: 4px; background: var(--bg-1); cursor: pointer; }
+      .status-card:hover { background: #fbfbff; box-shadow: 0 6px 18px rgba(79, 93, 255, 0.08); transform: translateY(-1px); }
+      .status-card-top { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-5); letter-spacing: 0.22px; }
+      .status-card strong { display: block; margin-top: 8px; font-size: 18px; font-weight: 600; }
+      .panel { background: var(--bg-1); border-radius: 4px; overflow: hidden; }
+      .panel-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line-4); padding: 12px 12px 10px; }
+      .section-button { display: flex; align-items: center; gap: 6px; border-radius: 4px; padding: 6px 8px; }
+      .section-button span { font-size: 16px; color: var(--text-7); }
+      .toolbar { display: flex; align-items: center; gap: 12px; }
+      .filter-button { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--line-6); border-radius: 4px; }
+      table { width: 100%; border-collapse: collapse; }
+      thead th { text-align: left; padding: 12px 10px; font-size: 14px; font-weight: 700; color: var(--text-2); white-space: nowrap; }
+      tbody tr { transition: background-color 180ms ease, transform 180ms ease; }
+      tbody tr:hover { background: rgba(79, 93, 255, 0.025); }
+      tbody td { padding: 12px 10px; border-top: 1px solid var(--line-3); font-size: 14px; color: var(--text-6); white-space: nowrap; }
+      .supplier { color: var(--primary-6); font-weight: 500; }
+      .check-box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(79, 93, 255, 0.3); }
+      .status-pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding-right: 10px; font-size: 12px; font-weight: 500; }
+      .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 10px; }
+      .action-cell { display: flex; align-items: center; gap: 8px; }
+      .view-button { display: inline-flex; align-items: center; justify-content: center; height: 28px; border-radius: 999px; padding: 0 12px; background: var(--bg-6); color: var(--primary-6); font-size: 14px; }
+      .more-button-small { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; background: var(--bg-6); color: var(--primary-6); }
+      .pagination { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line-4); padding: 12px 16px; }
+      .pagination-meta { display: flex; align-items: center; gap: 14px; color: var(--text-4); font-size: 14px; }
+      .rows-select { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line-5); }
+      .pager { display: flex; align-items: center; gap: 12px; }
+      .page-chip { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 28px; border-radius: 4px; border: 1px solid transparent; font-size: 14px; color: var(--text-6); }
+      .page-chip.active { background: var(--bg-8); border-color: rgba(0,0,0,0.02); }
+      .page-arrow { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line-6); }
+      .ellipsis { width: 30px; text-align: center; color: var(--text-4); font-size: 16px; font-weight: 700; }
 
-/* ---------------- shared building blocks ---------------- */
-
-const HoverStyles = () => (
-  <style>{`
-    .hov-soft:hover { background-color: ${C.bg6} !important; }
-    .hov-soft-alt:hover { background-color: ${C.bg8} !important; }
-    .hov-border-primary:hover { border-color: ${C.primary6} !important; }
-    .hov-primary-dark:hover { background-color: #3f4be0 !important; border-color: #3f4be0 !important; }
-    .hov-outline:hover { border-color: ${C.primary6} !important; background-color: ${C.bg6} !important; }
-    .hov-outline-fill:hover { background-color: ${C.primary2} !important; }
-    .hov-row:hover { background-color: ${C.bg6} !important; }
-    .clickable { cursor: pointer; transition: background-color 180ms ease, border-color 180ms ease, opacity 180ms ease, color 180ms ease, transform 180ms ease; }
-    .nav-toggle .chevron-arrow { opacity: 0; }
-    .nav-toggle:hover .chevron-arrow { opacity: 1 !important; }
-    .sidebar-scroll { scrollbar-width: none; -ms-overflow-style: none; }
-    .sidebar-scroll::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-    .aggregate-row .add-aggregate-btn { opacity: 0; }
-    .aggregate-row:hover .add-aggregate-btn { opacity: 1 !important; }
-    .add-aggregate-btn:hover { background-color: ${C.primary6} !important; }
-    .add-aggregate-btn:hover svg { color: #ffffff !important; }
-    .aggregate-row:hover { background-color: ${C.bg6} !important; }
-    .aggregate-row.is-active:hover { background-color: rgba(79,93,255,0.32) !important; }
-    .collapsed-flyout { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 180ms ease; }
-    .collapsed-nav-item:hover .collapsed-flyout { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
-  `}</style>
-);
-
-function PrimaryButton({ children }) {
-  return (
-    <button
-      className="clickable hov-primary-dark flex items-center gap-1 rounded px-2 py-2 text-sm font-bold text-white"
-      style={{ backgroundColor: C.primary6, border: `1px solid ${C.primary6}` }}
-    >
-      <Icon.Plus className="p-1" />
-      <span className="px-1">{children}</span>
-      <Icon.ChevronDown className="p-1" />
-    </button>
-  );
-}
-
-function OutlineIconButton({ icon }) {
-  return (
-    <button
-      className="clickable hov-outline flex items-center justify-center rounded p-2"
-      style={{ border: `1px solid ${C.line6}` }}
-    >
-      {icon}
-    </button>
-  );
-}
-
-/* ---------------- smooth eased scroll helper ---------------- */
-
-function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
-function smoothScrollElementIntoView(container, element, duration = 650) {
-  if (!container || !element) return;
-  const containerRect = container.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-  const relativeTop = elementRect.top - containerRect.top;
-  const maxScroll = container.scrollHeight - container.clientHeight;
-  const start = container.scrollTop;
-
-  // Center the opened app within the visible list so that, whenever there's
-  // room, both the previous and the next app peek into view around it.
-  const desiredRelativeTop = Math.max(0, (containerRect.height - elementRect.height) / 2);
-  const target = Math.max(0, Math.min(start + relativeTop - desiredRelativeTop, maxScroll));
-  const change = target - start;
-  if (Math.abs(change) < 1) return;
-
-  let startTime = null;
-  function step(timestamp) {
-    if (startTime === null) startTime = timestamp;
-    const elapsed = timestamp - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    container.scrollTop = start + change * easeInOutCubic(progress);
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-const STATUS_STYLES = {
-  Pending: { bg: C.warning1, fg: C.warning6 },
-  Paid: { bg: C.success1, fg: C.success6 },
-  Delivered: { bg: C.info1, fg: C.info6 },
-  Processing: { bg: C.warning1, fg: C.warning6 },
-  Overdue: { bg: C.danger1, fg: C.danger6 },
-};
-
-function StatusBadge({ status }) {
-  const s = STATUS_STYLES[status] || STATUS_STYLES.Pending;
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded pr-2 text-xs font-medium"
-      style={{ backgroundColor: s.bg, color: s.fg, tracking: "0.24px" }}
-    >
-      <svg width="10" height="10" viewBox="0 0 10 10" className="ml-2">
-        <circle cx="5" cy="5" r="3.5" fill={s.fg} />
-      </svg>
-      {status}
-    </span>
-  );
-}
-
-/* ---------------- data (matches the Figma rows) ---------------- */
-
-const ROWS = [
-  { supplier: "Amazon", order: "PO 0019", orderDate: "July 16, 2026", dueDate: "July 26, 2026", location: "Mirpur", category: "Glass", tax: "$40", status: "Pending" },
-  { supplier: "eBay", order: "PO 0020", orderDate: "July 17, 2026", dueDate: "July 27, 2026", location: "Banani", category: "Plastic", tax: "$25", status: "Paid" },
-  { supplier: "Walmart", order: "PO 0021", orderDate: "July 18, 2026", dueDate: "July 28, 2026", location: "Uttara", category: "Wood", tax: "$55", status: "Paid" },
-  { supplier: "Target", order: "PO 0022", orderDate: "July 19, 2026", dueDate: "July 29, 2026", location: "Gulshan", category: "Metal", tax: "$60", status: "Overdue" },
-  { supplier: "Flipkart", order: "PO 0024", orderDate: "July 21, 2026", dueDate: "July 31, 2026", location: "Motijheel", category: "Paper", tax: "$15", status: "Processing" },
-  { supplier: "Best Buy", order: "PO 0025", orderDate: "July 22, 2026", dueDate: "August 1, 2026", location: "Banani", category: "Plastic", tax: "$45", status: "Paid" },
-  { supplier: "Costco", order: "PO 0026", orderDate: "July 23, 2026", dueDate: "August 2, 2026", location: "Mirpur", category: "Metal", tax: "$50", status: "Pending" },
-  { supplier: "Shopify", order: "PO 0027", orderDate: "July 24, 2026", dueDate: "August 3, 2026", location: "Uttara", category: "Glass", tax: "$38", status: "Delivered" },
-  { supplier: "Rakuten", order: "PO 0028", orderDate: "July 25, 2026", dueDate: "August 4, 2026", location: "Gulshan", category: "Ceramic", tax: "$42", status: "Overdue" },
-];
-
-const STATUS_CARDS = [
-  { label: "Purchase order", count: "#12", amount: "$1335.00", color: C.info6 },
-  { label: "Paid", count: "#5", amount: "$500.00", color: C.success6 },
-  { label: "Pending", count: "#5", amount: "$550.00", color: C.warning6 },
-  { label: "Overdue", count: "#2", amount: "$280.00", color: C.danger6 },
-];
-
-/* ---------------- Top Bar ---------------- */
-
-function TopBar() {
-  return (
-    <div className="flex h-[56px] items-center justify-between px-2" style={{ backgroundColor: C.bg1 }}>
-      <div className="flex items-center">
-        <p className="w-[220px] text-[16px] font-semibold" style={{ color: C.text6, letterSpacing: "0.16px" }}>
-          Mukut
-        </p>
-        <div className="flex items-center gap-2 border-l border-r px-3 whitespace-nowrap" style={{ borderColor: C.line5 }}>
-          <span className="text-[15px] font-medium" style={{ color: C.text7 }}>
-            XYZ Builders
-          </span>
-          <span className="text-[13px]" style={{ color: C.text5, letterSpacing: "0.13px" }}>
-            AB Branch
-          </span>
+      @media (max-width: 980px) { .search-box { display: none; } .status-strip { flex-wrap: wrap; } .content { padding-left: 8px; padding-right: 8px; } }
+      @media (max-width: 720px) { .branch-tag { display: none; } .brand-name { width: auto; } .top-actions { width: auto; } .sidebar { width: 180px; } }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-section">
+          <div class="brand-name">Mukut</div>
+          <div class="branch-tag">
+            <strong>XYZ Builders</strong>
+            <span>AB Branch</span>
+          </div>
         </div>
-      </div>
 
-      <div className="w-[520px]">
-        <div className="clickable hov-soft-alt flex items-center gap-3 rounded p-2" style={{ backgroundColor: C.bg6 }}>
-          <Icon.Search style={{ color: C.text4 }} />
-          <span className="text-[15px]" style={{ color: C.text4, letterSpacing: "0.15px" }}>
-            Search, Navigate, Find
-          </span>
+        <div class="search-box" aria-label="Search area">
+          <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4" fill="none"></circle><path d="M12.5 12.5L17 17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg>
+          <span>Search, Navigate, Find</span>
         </div>
-      </div>
 
-      <div className="flex items-center justify-end gap-1 w-[403px]">
-        <button className="clickable hov-soft rounded p-2">
-          <Icon.Bell style={{ color: C.text6 }} />
-        </button>
-        <button className="clickable hov-soft rounded p-2">
-          <Icon.Settings style={{ color: C.text6 }} />
-        </button>
-        <button className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5">
-          <Icon.User style={{ color: C.text6 }} />
-          <span className="flex flex-col text-left">
-            <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
-              Mr. Henry
-            </span>
-            <span className="text-[12px]" style={{ color: C.text4, letterSpacing: "0.12px" }}>
-              Account Manager
-            </span>
-          </span>
-        </button>
-      </div>
-    </div>
-  );
-}
+        <div class="top-actions">
+          <button class="icon-button" aria-label="Notifications">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 2a5 5 0 00-5 5v2.5c0 .8-.3 1.6-.9 2.2L3 13h14l-1.1-1.3a3 3 0 01-.9-2.2V7a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"></path><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.3" fill="none"></path></svg>
+          </button>
+          <button class="icon-button" aria-label="Settings">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M8.2 2.5h3.6l.4 1.9c.4.15.77.34 1.12.57l1.83-.63 1.8 3.12-1.46 1.28c.03.2.05.4.05.61s-.02.41-.05.61l1.46 1.28-1.8 3.12-1.83-.63c-.35.23-.72.42-1.12.57l-.4 1.9H8.2l-.4-1.9a5.9 5.9 0 01-1.12-.57l-1.83.63-1.8-3.12 1.46-1.28A4.9 4.9 0 014.46 10c0-.21.02-.41.05-.61L3.05 8.11l1.8-3.12 1.83.63c.35-.23.72-.42 1.12-.57z" stroke="currentColor" stroke-width="1.15" fill="none" stroke-linejoin="round"></path><circle cx="10" cy="10" r="2.4" stroke="currentColor" stroke-width="1.15" fill="none"></circle></svg>
+          </button>
+          <button class="profile-button" aria-label="User profile">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.3" fill="none"></circle><path d="M3.5 17c1-3 4-4.5 6.5-4.5s5.5 1.5 6.5 4.5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"></path></svg>
+            <span class="profile-meta"><strong>Mr. Henry</strong><span>Account Manager</span></span>
+          </button>
+        </div>
+      </header>
 
-/* ---------------- Side Nav ---------------- */
-
-const FAVORITE_ITEMS = [
-  { label: "Home", icon: Icon.Home, children: ["Dashboard", "My Portal", "My Approvals"] },
-  { label: "Report", icon: Icon.Report, children: ["Sales Report", "Inventory Report", "Financial Report"] },
-  {
-    label: "Procurement",
-    icon: Icon.Procurement,
-    children: ["RFQ", "Purchase Orders", "Purchase Receives", "Bills"],
-    defaultOpen: true,
-  },
-];
-
-const ALL_APPS_ITEMS = [
-  { label: "Sales", icon: Icon.Sales, children: ["Quotes", "Sales Orders", "Invoices"] },
-  { label: "Receivable", icon: Icon.Receivable, children: ["Customer Invoices", "Payments Received", "Credit Notes"] },
-  { label: "Payable", icon: Icon.Payable, children: ["Vendor Bills", "Payments Made", "Debit Notes"] },
-  {
-    label: "Accounting",
-    icon: Icon.Accounting,
-    children: [
-      "Journal Entries",
-      "Chart of Accounts",
-      "Bank Reconciliation",
-      "Ledger Reports",
-      "Trial Balance",
-      "Fixed Assets",
-      "Depreciation Schedule",
-      "Cost Centers",
-      "Year-End Closing",
-    ],
-  },
-  { label: "Tax", icon: Icon.Tax, children: ["Tax Returns", "Tax Settings", "Tax Reports"] },
-];
-
-function NavItem({ label, Ico, active, open, activeChild, onToggleApp, onSelectChild, hasChildren, children }) {
-  const showChevron = open || active;
-  const highlighted = open || active;
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    if (open && itemRef.current) {
-      const t = setTimeout(() => {
-        const container = itemRef.current.closest(".sidebar-scroll");
-        // Centering the opened app (rather than "nearest") leaves room on
-        // both sides, so the previous and next apps can peek into view too.
-        smoothScrollElementIntoView(container, itemRef.current, 650);
-      }, 460);
-      return () => clearTimeout(t);
-    }
-  }, [open]);
-
-  return (
-    <div ref={itemRef} className="flex w-full flex-col gap-[2px]">
-      <button
-        type="button"
-        onClick={() => onToggleApp(label)}
-        className="nav-toggle clickable hov-soft flex w-full items-center rounded px-4 py-3"
-        style={{ backgroundColor: highlighted ? C.bg6 : "transparent", transition: "background-color 400ms ease" }}
-      >
-        <span
-          className="flex items-center justify-center overflow-hidden"
-          style={{
-            width: highlighted ? 0 : 16,
-            marginRight: highlighted ? 0 : 12,
-            opacity: highlighted ? 0 : 1,
-            transition: "width 450ms ease, margin-right 450ms ease, opacity 350ms ease",
-          }}
-        >
-          <Ico style={{ color: C.primary6, flexShrink: 0 }} />
-        </span>
-        <span
-          className="flex-1 text-left text-[15px]"
-          style={{ color: highlighted ? C.text7 : C.text6, letterSpacing: "0.15px", transition: "color 400ms ease" }}
-        >
-          {label}
-        </span>
-        {hasChildren && (
-          <Icon.ChevronDown
-            className="chevron-arrow"
-            style={{
-              color: C.text6,
-              opacity: showChevron ? 1 : 0,
-              transition: "transform 400ms ease, opacity 350ms ease",
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          />
-        )}
-      </button>
-
-      {hasChildren && (
-        <div
-          className="flex flex-col gap-[2px] pl-11"
-          style={{
-            maxHeight: open ? children.length * 44 + 8 : 0,
-            opacity: open ? 1 : 0,
-            overflow: "hidden",
-            transition: "max-height 450ms ease, opacity 400ms ease",
-          }}
-        >
-          {children.map((child) => {
-            const isChildActive = child === activeChild;
-            return (
-              <div
-                key={child}
-                className={`aggregate-row flex items-center rounded-r${isChildActive ? " is-active" : ""}`}
-                style={{
-                  borderLeft: `4px solid ${isChildActive ? C.primary4 : "transparent"}`,
-                  backgroundColor: isChildActive ? C.primary2 : "transparent",
-                  transition: "border-color 400ms ease, background-color 400ms ease",
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => onSelectChild(label, child)}
-                  className="clickable flex-1 bg-transparent py-2 text-left text-[13px]"
-                  style={{
-                    color: isChildActive ? C.text7 : C.text6,
-                    fontWeight: isChildActive ? 500 : 400,
-                    paddingLeft: isChildActive ? "calc(var(--spacing) * 2)" : 0,
-                    transition: "padding-left 400ms ease, color 400ms ease",
-                  }}
-                >
-                  {child}
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Add ${child}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectChild(label, child);
-                  }}
-                  className="add-aggregate-btn clickable flex flex-shrink-0 items-center justify-center rounded bg-transparent p-2"
-                  style={{ opacity: isChildActive ? 1 : undefined }}
-                >
-                  <Icon.Plus style={{ color: isChildActive ? C.primary6 : C.text6, transition: "color 400ms ease" }} />
-                </button>
+      <div class="workspace">
+        <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+          <div class="sidebar-panels">
+            <div class="sidebar-panel hidden" id="collapsed-panel">
+              <div class="group">
+                <div class="group-header" aria-hidden="true"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"></path></svg></div>
+                <div class="nav-stack">
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Home"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 8l6-5 6 5v6a1 1 0 01-1 1H3a1 1 0 01-1-1z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path></svg></span></button></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Report"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M5 10V7M8 10V5M11 10V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span></button></div>
+                  <div class="nav-item open"><button class="nav-item-header active open" type="button" aria-label="Procurement"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4h12M4 4v9a1 1 0 001 1h6a1 1 0 001-1V4M6 4V2h4v2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">RFQ</span><button class="add-button" type="button" aria-label="Add RFQ">+</button></div><div class="submenu-item active"><span class="item-text">Purchase Orders</span><button class="add-button" type="button" aria-label="Add Purchase Orders">+</button></div><div class="submenu-item"><span class="item-text">Purchase Receives</span><button class="add-button" type="button" aria-label="Add Purchase Receives">+</button></div><div class="submenu-item"><span class="item-text">Bills</span><button class="add-button" type="button" aria-label="Add Bills">+</button></div></div></div>
+                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ---------------- Collapsed Side Nav item (icon + hover flyout) ---------------- */
-
-function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) {
-  const hasChildren = Array.isArray(children) && children.length > 0;
-  const btnRef = useRef(null);
-  const [hovered, setHovered] = useState(false);
-  const [pos, setPos] = useState(null);
-
-  const handleEnter = () => {
-    if (btnRef.current) {
-      const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top, left: rect.right + 8 });
-    }
-    setHovered(true);
-  };
-  const handleLeave = () => setHovered(false);
-
-  return (
-    <div className="collapsed-nav-item relative flex w-full items-center justify-center" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-      <button ref={btnRef} type="button" aria-label={label} className="clickable hov-soft flex items-center justify-center rounded p-3">
-        <Ico style={{ color: C.primary6, width: 18, height: 18 }} />
-      </button>
-
-      {hasChildren &&
-        pos &&
-        createPortal(
-          <div
-            className="collapsed-flyout w-[190px] rounded p-1"
-            style={{
-              position: "fixed",
-              top: pos.top,
-              left: pos.left,
-              zIndex: 9999,
-              backgroundColor: C.bg1,
-              boxShadow: "16px 0px 40px rgba(0,0,0,0.16)",
-              opacity: hovered ? 1 : 0,
-              visibility: hovered ? "visible" : "hidden",
-              pointerEvents: hovered ? "auto" : "none",
-              transition: "opacity 180ms ease",
-            }}
-            onMouseEnter={handleEnter}
-            onMouseLeave={handleLeave}
-          >
-            <div className="rounded p-2" style={{ backgroundColor: C.bg6 }}>
-              <span className="text-[15px]" style={{ color: C.text5, letterSpacing: "0.15px" }}>
-                {label}
-              </span>
+              <div class="group">
+                <div class="group-header" aria-hidden="true"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect></svg></div>
+                <div class="nav-stack">
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Sales"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 13l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Receivable"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.2" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M4 7h8M4 10h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span></button></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Payable"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"></circle><path d="M8 5v6M6 10c0 1 .9 1.5 2 1.5s2-.5 2-1.4c0-.9-.7-1.2-2-1.5S6 8 6 7c0-.9.9-1.4 2-1.4s1.8.4 2 1.2" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round"></path></svg></span></button></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Accounting"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1v2M8 13v2M2 8h2M12 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><circle cx="8" cy="8" r="4.2" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg></span></button></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button" aria-label="Tax"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 3h10v10H3z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path><path d="M5 11L11 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span></button></div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-[2px] pt-1">
-              {children.map((child) => {
-                const isChildActive = child === activeChild;
-                return (
-                  <div
-                    key={child}
-                    className={`aggregate-row flex items-center rounded-r${isChildActive ? " is-active" : ""}`}
-                    style={{
-                      borderLeft: `4px solid ${isChildActive ? C.primary4 : "transparent"}`,
-                      backgroundColor: isChildActive ? C.primary2 : "transparent",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => onSelectChild(label, child)}
-                      className="clickable flex-1 bg-transparent py-2 text-left text-[13px]"
-                      style={{
-                        color: isChildActive ? C.text7 : C.text6,
-                        fontWeight: isChildActive ? 500 : 400,
-                        paddingLeft: isChildActive ? "calc(var(--spacing) * 2)" : 0,
-                      }}
-                    >
-                      {child}
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Add ${child}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectChild(label, child);
-                      }}
-                      className="add-aggregate-btn clickable flex flex-shrink-0 items-center justify-center rounded bg-transparent p-2"
-                      style={{ opacity: isChildActive ? 1 : undefined }}
-                    >
-                      <Icon.Plus style={{ color: isChildActive ? C.primary6 : C.text6 }} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>,
-          document.body
-        )}
-    </div>
-  );
-}
 
-function SideNav() {
-  const [openApps, setOpenApps] = useState({ Procurement: true });
-  const [activeApp, setActiveApp] = useState("Procurement");
-  const [activeChild, setActiveChild] = useState("Purchase Orders");
-  const [collapsed, setCollapsed] = useState(false);
+            <div class="sidebar-panel" id="expanded-panel">
+              <div class="group">
+                <div class="group-header"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"></path></svg><span class="label">Favorites</span></div>
+                <div class="nav-stack">
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 8l6-5 6 5v6a1 1 0 01-1 1H3a1 1 0 01-1-1z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path></svg></span><span class="label">Home</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Dashboard</span><button class="add-button" type="button" aria-label="Add Dashboard">+</button></div><div class="submenu-item"><span class="item-text">My Portal</span><button class="add-button" type="button" aria-label="Add My Portal">+</button></div><div class="submenu-item"><span class="item-text">My Approvals</span><button class="add-button" type="button" aria-label="Add My Approvals">+</button></div></div></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M5 10V7M8 10V5M11 10V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span><span class="label">Report</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Sales Report</span><button class="add-button" type="button" aria-label="Add Sales Report">+</button></div><div class="submenu-item"><span class="item-text">Inventory Report</span><button class="add-button" type="button" aria-label="Add Inventory Report">+</button></div><div class="submenu-item"><span class="item-text">Financial Report</span><button class="add-button" type="button" aria-label="Add Financial Report">+</button></div></div></div>
+                  <div class="nav-item open"><button class="nav-item-header active open" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4h12M4 4v9a1 1 0 001 1h6a1 1 0 001-1V4M6 4V2h4v2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path></svg></span><span class="label">Procurement</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">RFQ</span><button class="add-button" type="button" aria-label="Add RFQ">+</button></div><div class="submenu-item active"><span class="item-text">Purchase Orders</span><button class="add-button" type="button" aria-label="Add Purchase Orders">+</button></div><div class="submenu-item"><span class="item-text">Purchase Receives</span><button class="add-button" type="button" aria-label="Add Purchase Receives">+</button></div><div class="submenu-item"><span class="item-text">Bills</span><button class="add-button" type="button" aria-label="Add Bills">+</button></div></div></div>
+                </div>
+              </div>
 
-  // Clicking an app header only expands/collapses that app's own list.
-  // It never touches which app is "active" and never force-closes others.
-  // Clicking an app header expands/collapses that app's own list.
-  // Non-active apps behave as a single-open accordion (opening one closes any
-  // other open non-active app); the active app's open state is independent
-  // and is never touched by opening/closing a different, non-active app.
-  const handleToggleApp = (label) => {
-    setOpenApps((prev) => {
-      const willOpen = !prev[label];
-      if (label === activeApp) {
-        return { ...prev, [label]: willOpen };
-      }
-      return { [activeApp]: prev[activeApp], [label]: willOpen };
-    });
-  };
-
-  // Selecting an Aggregate makes its app the active one (hides its icon) and
-  // is the only action that closes whichever app was active before.
-  const handleSelectChild = (app, child) => {
-    setOpenApps((prev) => {
-      const next = { ...prev, [app]: true };
-      if (activeApp && activeApp !== app) {
-        next[activeApp] = false;
-      }
-      return next;
-    });
-    setActiveApp(app);
-    setActiveChild(child);
-  };
-
-  return (
-    <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden ${collapsed ? "w-[48px]" : "w-[220px]"}`}
-      style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
-    >
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <div
-          className="sidebar-scroll absolute inset-0 flex flex-col gap-1 overflow-y-auto"
-          style={{
-            opacity: collapsed ? 1 : 0,
-            pointerEvents: collapsed ? "auto" : "none",
-            transition: "opacity 260ms ease",
-          }}
-        >
-          <div className="flex flex-col items-center gap-2 p-2">
-            <div className="flex items-center justify-center px-[2px] py-2 opacity-80">
-              <Icon.Star style={{ color: C.text4 }} />
-            </div>
-            <div className="flex w-full flex-col gap-1">
-              {FAVORITE_ITEMS.map((it) => (
-                <CollapsedNavItem
-                  key={it.label}
-                  label={it.label}
-                  Ico={it.icon}
-                  children={it.children}
-                  activeChild={activeApp === it.label ? activeChild : null}
-                  onSelectChild={handleSelectChild}
-                />
-              ))}
+              <div class="group">
+                <div class="group-header"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"></rect></svg><span class="label">All Apps</span></div>
+                <div class="nav-stack">
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 13l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="label">Sales</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Quotes</span><button class="add-button" type="button" aria-label="Add Quotes">+</button></div><div class="submenu-item"><span class="item-text">Sales Orders</span><button class="add-button" type="button" aria-label="Add Sales Orders">+</button></div><div class="submenu-item"><span class="item-text">Invoices</span><button class="add-button" type="button" aria-label="Add Invoices">+</button></div></div></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.2" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M4 7h8M4 10h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span><span class="label">Receivable</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Customer Invoices</span><button class="add-button" type="button" aria-label="Add Customer Invoices">+</button></div><div class="submenu-item"><span class="item-text">Payments Received</span><button class="add-button" type="button" aria-label="Add Payments Received">+</button></div><div class="submenu-item"><span class="item-text">Credit Notes</span><button class="add-button" type="button" aria-label="Add Credit Notes">+</button></div></div></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"></circle><path d="M8 5v6M6 10c0 1 .9 1.5 2 1.5s2-.5 2-1.4c0-.9-.7-1.2-2-1.5S6 8 6 7c0-.9.9-1.4 2-1.4s1.8.4 2 1.2" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round"></path></svg></span><span class="label">Payable</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Vendor Bills</span><button class="add-button" type="button" aria-label="Add Vendor Bills">+</button></div><div class="submenu-item"><span class="item-text">Payments Made</span><button class="add-button" type="button" aria-label="Add Payments Made">+</button></div><div class="submenu-item"><span class="item-text">Debit Notes</span><button class="add-button" type="button" aria-label="Add Debit Notes">+</button></div></div></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1v2M8 13v2M2 8h2M12 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><circle cx="8" cy="8" r="4.2" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg></span><span class="label">Accounting</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Journal Entries</span><button class="add-button" type="button" aria-label="Add Journal Entries">+</button></div><div class="submenu-item"><span class="item-text">Chart of Accounts</span><button class="add-button" type="button" aria-label="Add Chart of Accounts">+</button></div><div class="submenu-item"><span class="item-text">Bank Reconciliation</span><button class="add-button" type="button" aria-label="Add Bank Reconciliation">+</button></div><div class="submenu-item"><span class="item-text">Ledger Reports</span><button class="add-button" type="button" aria-label="Add Ledger Reports">+</button></div></div></div>
+                  <div class="nav-item"><button class="nav-item-header" type="button"><span class="nav-icon-wrap"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 3h10v10H3z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path><path d="M5 11L11 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></span><span class="label">Tax</span><span class="chevron"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="submenu"><div class="submenu-item"><span class="item-text">Tax Returns</span><button class="add-button" type="button" aria-label="Add Tax Returns">+</button></div><div class="submenu-item"><span class="item-text">Tax Settings</span><button class="add-button" type="button" aria-label="Add Tax Settings">+</button></div><div class="submenu-item"><span class="item-text">Tax Reports</span><button class="add-button" type="button" aria-label="Add Tax Reports">+</button></div></div></div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2 p-2">
-            <div className="flex items-center justify-center px-[2px] py-2 opacity-80">
-              <Icon.Grid style={{ color: C.text4 }} />
-            </div>
-            <div className="flex w-full flex-col gap-1">
-              {ALL_APPS_ITEMS.map((it) => (
-                <CollapsedNavItem
-                  key={it.label}
-                  label={it.label}
-                  Ico={it.icon}
-                  children={it.children}
-                  activeChild={activeApp === it.label ? activeChild : null}
-                  onSelectChild={handleSelectChild}
-                />
-              ))}
-            </div>
+          <div class="sidebar-footer">
+            <div class="expand-box hidden" id="expand-box"><button class="side-collapse-button" type="button" aria-label="Expand sidebar"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" style="transform: rotate(180deg)"><path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+            <div class="collapse-box" id="collapse-box"><div class="personalization"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M2 3h10M2 7h10M2 11h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg><span>Personalization</span></div><button class="side-collapse-button" type="button" aria-label="Collapse sidebar"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true"><path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
           </div>
-        </div>
+        </aside>
 
-        <div
-          className="sidebar-scroll absolute inset-0 flex flex-col gap-1 overflow-y-auto"
-          style={{
-            opacity: collapsed ? 0 : 1,
-            pointerEvents: collapsed ? "none" : "auto",
-            transition: "opacity 260ms ease",
-          }}
-        >
-          <div className="flex flex-col gap-2 p-2">
-            <div className="flex items-center gap-2 px-[2px] py-2 opacity-80">
-              <Icon.Star style={{ color: C.text4 }} />
-              <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
-                Favorites
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              {FAVORITE_ITEMS.map((it) => (
-                <NavItem
-                  key={it.label}
-                  label={it.label}
-                  Ico={it.icon}
-                  active={activeApp === it.label}
-                  open={!!openApps[it.label]}
-                  hasChildren={Array.isArray(it.children) && it.children.length > 0}
-                  children={it.children}
-                  activeChild={activeApp === it.label ? activeChild : null}
-                  onToggleApp={handleToggleApp}
-                  onSelectChild={handleSelectChild}
-                />
-              ))}
+        <main class="content" aria-label="Purchase orders dashboard">
+          <div class="page-header">
+            <h1>Purchase Orders</h1>
+            <div class="page-header-actions">
+              <button class="more-button" type="button"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg><span>More</span></button>
+              <button class="primary-button" type="button"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg><span>Purchase Order</span><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-2">
-            <div className="flex items-center gap-2 px-[2px] py-2 opacity-80">
-              <Icon.Grid style={{ color: C.text4 }} />
-              <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
-                All Apps
-              </span>
+          <div class="status-strip">
+            <div class="status-card"><div class="status-card-top"><span>Purchase order</span><span>#12</span></div><strong style="color: var(--info-6)">$1335.00</strong></div>
+            <div class="status-card"><div class="status-card-top"><span>Paid</span><span>#5</span></div><strong style="color: var(--success-6)">$500.00</strong></div>
+            <div class="status-card"><div class="status-card-top"><span>Pending</span><span>#5</span></div><strong style="color: var(--warning-6)">$550.00</strong></div>
+            <div class="status-card"><div class="status-card-top"><span>Overdue</span><span>#2</span></div><strong style="color: var(--danger-6)">$280.00</strong></div>
+          </div>
+
+          <section class="panel" aria-label="Purchase order table">
+            <div class="panel-header">
+              <button class="section-button" type="button"><span>All Purchase Orders</span><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              <div class="toolbar">
+                <button class="filter-button" type="button" aria-label="Filter"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M1 2h12l-4.5 5.5V12L6.5 13V7.5z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path></svg></button>
+                <button class="filter-button" type="button" aria-label="Sort"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 3v8M3 3L1 5M3 3l2 2M11 11V3M11 11l2-2M11 11l-2-2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <button class="filter-button" type="button" aria-label="Columns"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M5 1v12M9 1v12" stroke="currentColor" stroke-width="1.2"></path></svg></button>
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              {ALL_APPS_ITEMS.map((it) => (
-                <NavItem
-                  key={it.label}
-                  label={it.label}
-                  Ico={it.icon}
-                  active={activeApp === it.label}
-                  open={!!openApps[it.label]}
-                  hasChildren={Array.isArray(it.children) && it.children.length > 0}
-                  children={it.children}
-                  activeChild={activeApp === it.label ? activeChild : null}
-                  onToggleApp={handleToggleApp}
-                  onSelectChild={handleSelectChild}
-                />
-              ))}
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 36px; padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></th>
+                  <th style="width: 156px;">Supplier</th>
+                  <th style="width: 156px;">Order No.</th>
+                  <th style="width: 220px;">Order Date</th>
+                  <th style="width: 220px;">Due Date</th>
+                  <th style="width: 156px;">Location</th>
+                  <th style="width: 156px;">Category</th>
+                  <th style="width: 96px;">Tax</th>
+                  <th style="width: 156px;">Status</th>
+                  <th style="width: 156px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Amazon</td><td>PO 0019</td><td>July 16, 2026</td><td>July 26, 2026</td><td>Mirpur</td><td>Glass</td><td>$40</td><td><span class="status-pill" style="background: var(--warning-1); color: var(--warning-6);"><span class="status-dot" style="background: var(--warning-6);"></span>Pending</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">eBay</td><td>PO 0020</td><td>July 17, 2026</td><td>July 27, 2026</td><td>Banani</td><td>Plastic</td><td>$25</td><td><span class="status-pill" style="background: var(--success-1); color: var(--success-6);"><span class="status-dot" style="background: var(--success-6);"></span>Paid</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Walmart</td><td>PO 0021</td><td>July 18, 2026</td><td>July 28, 2026</td><td>Uttara</td><td>Wood</td><td>$55</td><td><span class="status-pill" style="background: var(--success-1); color: var(--success-6);"><span class="status-dot" style="background: var(--success-6);"></span>Paid</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Target</td><td>PO 0022</td><td>July 19, 2026</td><td>July 29, 2026</td><td>Gulshan</td><td>Metal</td><td>$60</td><td><span class="status-pill" style="background: var(--danger-1); color: var(--danger-6);"><span class="status-dot" style="background: var(--danger-6);"></span>Overdue</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Flipkart</td><td>PO 0024</td><td>July 21, 2026</td><td>July 31, 2026</td><td>Motijheel</td><td>Paper</td><td>$15</td><td><span class="status-pill" style="background: var(--warning-1); color: var(--warning-6);"><span class="status-dot" style="background: var(--warning-6);"></span>Processing</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Best Buy</td><td>PO 0025</td><td>July 22, 2026</td><td>August 1, 2026</td><td>Banani</td><td>Plastic</td><td>$45</td><td><span class="status-pill" style="background: var(--success-1); color: var(--success-6);"><span class="status-dot" style="background: var(--success-6);"></span>Paid</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Costco</td><td>PO 0026</td><td>July 23, 2026</td><td>August 2, 2026</td><td>Mirpur</td><td>Metal</td><td>$50</td><td><span class="status-pill" style="background: var(--warning-1); color: var(--warning-6);"><span class="status-dot" style="background: var(--warning-6);"></span>Pending</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Shopify</td><td>PO 0027</td><td>July 24, 2026</td><td>August 3, 2026</td><td>Uttara</td><td>Glass</td><td>$38</td><td><span class="status-pill" style="background: var(--info-1); color: var(--info-6);"><span class="status-dot" style="background: var(--info-6);"></span>Delivered</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+                <tr><td style="padding-left: 12px;"><div class="check-box" aria-hidden="true"></div></td><td class="supplier">Rakuten</td><td>PO 0028</td><td>July 25, 2026</td><td>August 4, 2026</td><td>Gulshan</td><td>Ceramic</td><td>$42</td><td><span class="status-pill" style="background: var(--danger-1); color: var(--danger-6);"><span class="status-dot" style="background: var(--danger-6);"></span>Overdue</span></td><td><div class="action-cell"><button class="view-button" type="button">View</button><button class="more-button-small" type="button" aria-label="More actions"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><circle cx="3" cy="7" r="1.3" fill="currentColor"></circle><circle cx="7" cy="7" r="1.3" fill="currentColor"></circle><circle cx="11" cy="7" r="1.3" fill="currentColor"></circle></svg></button></div></td></tr>
+              </tbody>
+            </table>
+
+            <div class="pagination">
+              <div class="pagination-meta"><span>Showing 10 of 1,000 Rows</span><div class="rows-select"><span>Rows per page 10</span><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+              <div class="pager" aria-label="Pagination"><button class="page-arrow" type="button" aria-label="Previous page"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button class="page-chip active" type="button">1</button><button class="page-chip" type="button">2</button><button class="page-chip" type="button">3</button><button class="page-chip" type="button">4</button><button class="page-chip" type="button">5</button><span class="ellipsis">...</span><button class="page-chip" type="button">9</button><button class="page-arrow" type="button" aria-label="Next page"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
             </div>
+          </section>
+        </main>
+
+        <aside class="assistant" aria-label="Quick actions">
+          <div class="assistant-header"><button class="side-collapse-button" type="button" aria-label="Collapse assistant sidebar"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" style="transform: rotate(180deg)"><path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+          <div class="assistant-actions">
+            <button class="assistant-button" type="button" aria-label="Analytics"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path d="M9 2a7 7 0 107 7H9z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"></path><path d="M9 2v7" stroke="currentColor" stroke-width="1.2"></path></svg></button>
+            <button class="assistant-button" type="button" aria-label="Journal"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="1.2" stroke="currentColor" stroke-width="1.2" fill="none"></rect><path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"></path></svg></button>
+            <button class="assistant-button" type="button" aria-label="Info"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"></circle><path d="M9 8v5M9 5.5v.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path></svg></button>
           </div>
-        </div>
-      </div>
-
-      <div className="relative flex-shrink-0" style={{ height: 56 }}>
-        <div
-          className="absolute inset-2 flex items-center justify-center"
-          style={{
-            opacity: collapsed ? 1 : 0,
-            pointerEvents: collapsed ? "auto" : "none",
-            transition: "opacity 260ms ease",
-          }}
-        >
-          <button
-            type="button"
-            aria-label="Expand sidebar"
-            onClick={() => setCollapsed(false)}
-            className="clickable hov-border-primary flex items-center rounded border p-[6px]"
-            style={{ backgroundColor: C.bg7, borderColor: C.line4 }}
-          >
-            <Icon.CollapseArrow style={{ color: C.text6, transform: "rotate(180deg)" }} />
-          </button>
-        </div>
-
-        <div
-          className="absolute inset-2 flex items-center gap-1 rounded pl-3 pr-2"
-          style={{
-            backgroundColor: C.bg6,
-            opacity: collapsed ? 0 : 1,
-            pointerEvents: collapsed ? "none" : "auto",
-            transition: "opacity 260ms ease",
-          }}
-        >
-          <button className="clickable hov-soft-alt flex flex-1 items-center gap-1 rounded p-2">
-            <svg viewBox="0 0 14 14" width="14" height="14" style={{ color: C.text5 }}>
-              <path d="M2 3h10M2 7h10M2 11h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <span className="text-[12px]" style={{ color: C.text5, letterSpacing: "0.12px" }}>
-              Personalization
-            </span>
-          </button>
-          <button
-            type="button"
-            aria-label="Collapse sidebar"
-            onClick={() => setCollapsed(true)}
-            className="clickable hov-border-primary flex items-center rounded border p-[6px]"
-            style={{ backgroundColor: C.bg1, borderColor: C.line4 }}
-          >
-            <Icon.CollapseArrow style={{ color: C.text6 }} />
-          </button>
-        </div>
+        </aside>
       </div>
     </div>
-  );
-}
 
-/* ---------------- Assistant rail ---------------- */
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const expandedPanel = document.getElementById('expanded-panel');
+      const collapsedPanel = document.getElementById('collapsed-panel');
+      const collapseBox = document.getElementById('collapse-box');
+      const expandBox = document.getElementById('expand-box');
 
-function Assistant() {
-  return (
-    <div className="flex w-[56px] flex-shrink-0 flex-col items-center self-stretch" style={{ backgroundColor: C.bg1 }}>
-      <div className="p-2">
-        <button
-          className="clickable hov-border-primary flex items-center rounded border p-[6px]"
-          style={{ backgroundColor: C.bg7, borderColor: C.line4 }}
-        >
-          <Icon.CollapseArrow style={{ color: C.text6, transform: "rotate(180deg)" }} />
-        </button>
-      </div>
-      <div className="flex flex-col gap-1 p-2">
-        <button className="clickable hov-soft flex items-center rounded p-2">
-          <Icon.ChartPie style={{ color: C.text6 }} />
-        </button>
-        <button className="clickable hov-soft flex items-center rounded p-2">
-          <Icon.Journal style={{ color: C.text6 }} />
-        </button>
-        <button className="clickable hov-soft flex items-center rounded p-2">
-          <Icon.Info style={{ color: C.text6 }} />
-        </button>
-      </div>
-    </div>
-  );
-}
+      const setSidebarState = (collapsed) => {
+        sidebar.classList.toggle('collapsed', collapsed);
+        expandedPanel.classList.toggle('hidden', collapsed);
+        collapsedPanel.classList.toggle('hidden', !collapsed);
+        collapseBox.classList.toggle('hidden', collapsed);
+        expandBox.classList.toggle('hidden', !collapsed);
+      };
 
-/* ---------------- Page header ---------------- */
+      document.querySelectorAll('.side-collapse-button').forEach((button) => {
+        button.addEventListener('click', () => setSidebarState(true));
+      });
 
-function PageHeader() {
-  return (
-    <div className="flex items-center justify-between rounded px-2 py-3">
-      <p className="text-[18px] font-semibold" style={{ color: C.text7 }}>
-        Purchase Orders
-      </p>
-      <div className="flex items-center gap-3">
-        <button
-          className="clickable hov-soft flex items-center gap-1 rounded p-2"
-          style={{ border: `1px solid ${C.primary5}` }}
-        >
-          <Icon.MoreDots style={{ color: C.primary6 }} />
-          <span className="px-1 text-[14px] font-bold" style={{ color: C.primary6 }}>
-            More
-          </span>
-        </button>
-        <PrimaryButton>Purchase Order</PrimaryButton>
-      </div>
-    </div>
-  );
-}
+      const expandButton = document.querySelector('#expand-box .side-collapse-button');
+      if (expandButton) { expandButton.addEventListener('click', () => setSidebarState(false)); }
 
-/* ---------------- Status strip ---------------- */
+      document.querySelectorAll('.nav-item-header').forEach((button) => {
+        button.addEventListener('click', () => {
+          const item = button.closest('.nav-item');
+          if (!item) return;
+          const alreadyOpen = item.classList.contains('open');
+          item.classList.toggle('open', !alreadyOpen);
+          button.classList.toggle('open', !alreadyOpen);
+          button.classList.toggle('active', !alreadyOpen);
+        });
+      });
 
-function StatusStrip() {
-  return (
-    <div className="flex items-center gap-2">
-      {STATUS_CARDS.map((s) => (
-        <div key={s.label} className="w-[260px] overflow-hidden rounded px-4 py-3" style={{ backgroundColor: C.bg1 }}>
-          <div className="flex items-center justify-between text-[11px] font-normal" style={{ color: C.text5, letterSpacing: "0.22px" }}>
-            <span>{s.label}</span>
-            <span>{s.count}</span>
-          </div>
-          <p className="mt-1 text-[18px] font-semibold" style={{ color: s.color }}>
-            {s.amount}
-          </p>
-        </div>
-      ))}
-      <div className="flex-1" />
-    </div>
-  );
-}
-
-/* ---------------- Section header ---------------- */
-
-function SectionHeader() {
-  return (
-    <div className="flex items-center justify-between border-b px-2 py-3" style={{ borderColor: C.line4 }}>
-      <div className="clickable hov-soft flex items-center gap-1 rounded px-2 py-1">
-        <span className="text-[16px]" style={{ color: C.text7 }}>
-          All Purchase Orders{" "}
-        </span>
-        <Icon.ChevronDown style={{ color: C.text7 }} />
-      </div>
-      <div className="flex items-center gap-4 px-2">
-        <OutlineIconButton icon={<Icon.Filter style={{ color: C.text6 }} />} />
-        <OutlineIconButton icon={<Icon.Sort style={{ color: C.text6 }} />} />
-        <OutlineIconButton icon={<Icon.Columns style={{ color: C.text6 }} />} />
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Table ---------------- */
-
-const COLS = [
-  { key: "supplier", label: "Supplier", width: 156 },
-  { key: "order", label: "Order No.", width: 156 },
-  { key: "orderDate", label: "Order Date", width: 220 },
-  { key: "dueDate", label: "Due Date", width: 220 },
-  { key: "location", label: "Location", width: 156 },
-  { key: "category", label: "Category", width: 156 },
-  { key: "tax", label: "Tax", width: 96 },
-  { key: "status", label: "Status", width: 156 },
-  { key: "action", label: "Action", width: 156 },
-];
-
-function Checkbox() {
-  return (
-    <div className="flex items-start px-[6px] py-[2px]">
-      <div
-        className="h-4 w-4 rounded"
-        style={{ border: `1px solid ${C.primary2}` }}
-      />
-    </div>
-  );
-}
-
-function TableHeaderRow() {
-  return (
-    <div className="flex items-center justify-between border-b" style={{ borderColor: C.line4 }}>
-      <Checkbox />
-      {COLS.map((c) => (
-        <div key={c.key} className="flex items-center gap-1 px-2 py-3" style={{ width: c.width }}>
-          <span className="text-[14px] font-bold whitespace-nowrap" style={{ color: C.text2 }}>
-            {c.label}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DataCell({ children, width }) {
-  return (
-    <div className="flex items-center gap-1 px-2 pt-1" style={{ width }}>
-      <span className="text-[14px] whitespace-nowrap" style={{ color: C.text6 }}>
-        {children}
-      </span>
-    </div>
-  );
-}
-
-function TableDataRow({ row, isLast }) {
-  return (
-    <div
-      className="hov-row flex items-center justify-between py-3"
-      style={!isLast ? { borderBottom: `1px solid ${C.line3}` } : undefined}
-    >
-      <Checkbox />
-      <div className="flex items-center gap-1 px-2 pt-1" style={{ width: 156 }}>
-        <span className="text-[14px] whitespace-nowrap font-normal" style={{ color: C.primary6 }}>
-          {row.supplier}
-        </span>
-      </div>
-      <DataCell width={156}>{row.order}</DataCell>
-      <DataCell width={220}>{row.orderDate}</DataCell>
-      <DataCell width={220}>{row.dueDate}</DataCell>
-      <DataCell width={156}>{row.location}</DataCell>
-      <DataCell width={156}>{row.category}</DataCell>
-      <DataCell width={96}>{row.tax}</DataCell>
-      <div className="flex items-center gap-1 px-2" style={{ width: 156 }}>
-        <StatusBadge status={row.status} />
-      </div>
-      <div className="flex items-center gap-1 px-2" style={{ width: 156 }}>
-        <div className="clickable hov-soft-alt flex items-center justify-center rounded-full px-3 py-1" style={{ backgroundColor: C.bg6 }}>
-          <span className="text-[14px]" style={{ color: C.primary6 }}>
-            View
-          </span>
-        </div>
-        <div className="clickable hov-soft-alt flex items-center justify-center rounded-full p-2" style={{ backgroundColor: C.bg6 }}>
-          <Icon.MoreDots style={{ color: C.primary6 }} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Table() {
-  return (
-    <div className="px-2">
-      <TableHeaderRow />
-      {ROWS.map((r, i) => (
-        <TableDataRow key={r.order} row={r} isLast={i === ROWS.length - 1} />
-      ))}
-    </div>
-  );
-}
-
-/* ---------------- Pagination ---------------- */
-
-function PageChip({ label, active }) {
-  return (
-    <div
-      className="clickable hov-soft flex w-[30px] items-center justify-center rounded px-3 py-1"
-      style={{
-        backgroundColor: active ? C.bg8 : "transparent",
-        border: "1px solid #ffffff",
-      }}
-    >
-      <span className="text-[14px]" style={{ color: C.text6 }}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function Pagination() {
-  return (
-    <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: C.line4 }}>
-      <div className="flex items-center gap-4">
-        <span className="text-[14px]" style={{ color: C.text4 }}>
-          Showing 10 of 1,000 Rows
-        </span>
-        <div className="clickable hov-outline flex items-center gap-1 rounded px-3 py-1" style={{ border: `1px solid ${C.line5}` }}>
-          <span className="text-[14px]" style={{ color: C.text6 }}>
-            Rows per page 10{" "}
-          </span>
-          <Icon.ChevronDown style={{ color: C.text6 }} />
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <button className="clickable hov-outline flex items-center justify-center rounded p-1" style={{ border: `1px solid ${C.line6}` }}>
-          <Icon.ChevronLeft style={{ color: C.text6 }} />
-        </button>
-        <PageChip label="1" active />
-        <PageChip label="2" />
-        <PageChip label="3" />
-        <PageChip label="4" />
-        <PageChip label="5" />
-        <span className="w-[30px] text-center text-[16px] font-bold" style={{ color: C.text4 }}>
-          ...
-        </span>
-        <PageChip label="9" />
-        <button className="clickable hov-outline flex items-center justify-center rounded p-1" style={{ border: `1px solid ${C.line6}` }}>
-          <Icon.ChevronRight style={{ color: C.text6 }} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Page ---------------- */
-
-export default function PurchaseOrdersPage() {
-  return (
-    <div
-      className="flex h-screen w-full flex-col gap-1 text-[#0d0d0d]"
-      style={{ backgroundColor: C.bg6, fontFamily: "Inter, sans-serif", "--spacing": "0.25rem" }}
-    >
-      <HoverStyles />
-      <TopBar />
-      <div className="flex flex-1 items-stretch gap-2 overflow-hidden">
-        <SideNav />
-        <div
-          className="flex flex-1 flex-col gap-2 overflow-auto px-[16px] py-[14px]"
-          style={{ backgroundColor: C.bg6 }}
-        >
-          <PageHeader />
-          <StatusStrip />
-          <div className="rounded" style={{ backgroundColor: C.bg1 }}>
-            <SectionHeader />
-            <Table />
-            <Pagination />
-          </div>
-        </div>
-        <Assistant />
-      </div>
-    </div>
-  );
-}
+      document.querySelectorAll('.submenu-item').forEach((row) => {
+        row.addEventListener('click', () => {
+          const parent = row.parentElement;
+          if (!parent) return;
+          parent.querySelectorAll('.submenu-item').forEach((item) => item.classList.remove('active'));
+          row.classList.add('active');
+        });
+      });
+    </script>
+  </body>
+</html>
