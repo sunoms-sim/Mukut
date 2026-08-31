@@ -640,7 +640,7 @@ function SideNav() {
 
   return (
     <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden ${collapsed ? "w-[48px]" : "w-[220px]"}`}
+      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden ${collapsed ? "w-[56px]" : "w-[220px]"}`}
       style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
     >
       {collapsed ? (
@@ -776,7 +776,7 @@ function SideNav() {
 
 function Assistant() {
   return (
-    <div className="flex w-[56px] flex-shrink-0 flex-col items-center self-stretch" style={{ backgroundColor: C.bg1 }}>
+    <div className="flex flex-shrink-0 flex-col self-stretch overflow-hidden w-[56px] items-center" style={{ backgroundColor: C.bg1 }}>
       <div className="p-2">
         <button
           className="clickable hov-border-primary flex items-center rounded border p-[6px]"
