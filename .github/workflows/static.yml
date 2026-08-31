@@ -24,11 +24,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: npm
 
       - name: Install dependencies
         run: npm install
+
+      - name: Fix Vite executable permissions
+        run: chmod +x ./node_modules/.bin/vite
 
       - name: Build site
         run: npm run build
