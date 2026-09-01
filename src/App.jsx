@@ -592,7 +592,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   const handleEnter = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top - 4, left: rect.left + 46 });
+      setPos({ top: rect.top - 4, left: rect.left + 54 });
     }
     setHovered(true);
   };
