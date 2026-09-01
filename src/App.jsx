@@ -616,7 +616,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
           style={{
             position: "fixed",
             top: pos.top,
-            left: pos.left,
+            left: 44,
             paddingLeft: 8,
             paddingRight: 8,
             zIndex: 9999,
