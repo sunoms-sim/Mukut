@@ -12,6 +12,7 @@ const C = {
   primary4: "#8f99ff",
   primary2: "rgba(79,93,255,0.2)",
   bg1: "#ffffff",
+  bg4: "#f3f4f6",
   bg6: "#f0f1f3",
   bg7: "#e8eaed",
   bg8: "#e0e3e7",
@@ -195,10 +196,76 @@ const Icon = {
       <path d="M9 8v5M9 5.5v.01" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   ),
+  Grip: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <circle cx="6" cy="4" r="1.2" fill="currentColor" />
+      <circle cx="12" cy="4" r="1.2" fill="currentColor" />
+      <circle cx="6" cy="9" r="1.2" fill="currentColor" />
+      <circle cx="12" cy="9" r="1.2" fill="currentColor" />
+      <circle cx="6" cy="14" r="1.2" fill="currentColor" />
+      <circle cx="12" cy="14" r="1.2" fill="currentColor" />
+    </svg>
+  ),
+  Close: (p) => (
+    <svg viewBox="0 0 16 16" width="16" height="16" {...p}>
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  Sliders: (p) => (
+    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
+      <path d="M2 3h10M2 7h10M2 11h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="5" cy="3" r="1.4" fill="currentColor" />
+      <circle cx="9" cy="7" r="1.4" fill="currentColor" />
+      <circle cx="5" cy="11" r="1.4" fill="currentColor" />
+    </svg>
+  ),
+  StarFilled: (p) => (
+    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
+      <path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  ),
+  Grid: (p) => (
+    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
+      <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
+    </svg>
+  ),
+  ChevronLeft: (p) => (
+    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
+      <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  ChevronRight: (p) => (
+    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
+      <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  CollapseArrow: (p) => (
+    <svg viewBox="0 0 22 22" width="22" height="22" {...p}>
+      <path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  ChartPie: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <path d="M9 2a7 7 0 107 7H9z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
+      <path d="M9 2v7" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  ),
+  Journal: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <rect x="3" y="2" width="12" height="14" rx="1.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 const HoverStyles = () => (
   <style>{`
+    html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
+    *, *::before, *::after { box-sizing: border-box; }
+    button { border: none; background: none; font: inherit; }
     .hov-soft:hover { background-color: ${C.bg6} !important; }
     .hov-soft-alt:hover { background-color: ${C.bg8} !important; }
     .hov-border-primary:hover { border-color: ${C.primary6} !important; }
@@ -248,6 +315,8 @@ function OutlineIconButton({ icon }) {
   );
 }
 
+/* ---------------- smooth eased scroll helper ---------------- */
+
 function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
@@ -259,6 +328,9 @@ function smoothScrollElementIntoView(container, element, duration = 650) {
   const relativeTop = elementRect.top - containerRect.top;
   const maxScroll = container.scrollHeight - container.clientHeight;
   const start = container.scrollTop;
+
+  // Center the opened app within the visible list so that, whenever there's
+  // room, both the previous and the next app peek into view around it.
   const desiredRelativeTop = Math.max(0, (containerRect.height - elementRect.height) / 2);
   const target = Math.max(0, Math.min(start + relativeTop - desiredRelativeTop, maxScroll));
   const change = target - start;
@@ -508,6 +580,8 @@ function NavItem({ label, Ico, active, open, activeChild, onToggleApp, onSelectC
   );
 }
 
+/* ---------------- Collapsed Side Nav item (icon + hover flyout) ---------------- */
+
 function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) {
   const hasChildren = Array.isArray(children) && children.length > 0;
   const isActiveApp = !!activeChild;
@@ -518,7 +592,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   const handleEnter = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top, left: rect.right });
+      setPos({ top: rect.top - 4, left: rect.left + 46 });
     }
     setHovered(true);
   };
@@ -544,6 +618,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
             top: pos.top,
             left: pos.left,
             paddingLeft: 8,
+            paddingRight: 8,
             zIndex: 9999,
             opacity: hovered ? 1 : 0,
             visibility: hovered ? "visible" : "hidden",
@@ -596,7 +671,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
                         className="add-aggregate-btn clickable flex flex-shrink-0 items-center justify-center rounded bg-transparent p-2"
                         style={{ opacity: isChildActive ? 1 : undefined }}
                       >
-                        <Icon.Plus style={{ color: isChildActive ? C.primary6 : C.text6 }} />
+                        <Icon.Plus style={{ color: isChildActive ? C.primary6 : C.text6, transition: "color 400ms ease" }} />
                       </button>
                     </div>
                   );
@@ -610,12 +685,201 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   );
 }
 
-function SideNav() {
+/* ---------------- Personalization modal ---------------- */
+
+function DraggableAppRow({ label, Ico, isFavorite, isSelected, onSelect }) {
+  return (
+    <div
+      onClick={onSelect}
+      className="clickable hov-soft flex w-full items-center gap-2 rounded px-4 py-3"
+      style={{ cursor: "pointer", backgroundColor: isSelected ? C.bg6 : "transparent" }}
+    >
+      {isFavorite ? (
+        <Icon.Grip style={{ color: C.text2, width: 14, height: 14, flexShrink: 0, cursor: "grab" }} />
+      ) : (
+        <span style={{ width: 14, flexShrink: 0 }} />
+      )}
+      <Ico style={{ color: isSelected ? C.text7 : C.text6, width: 16, height: 16, flexShrink: 0 }} />
+      <span
+        className="flex-1 text-[15px]"
+        style={{ color: isSelected ? C.text7 : C.text6, fontWeight: isSelected ? 500 : 400, letterSpacing: "0.15px" }}
+      >
+        {label}
+      </span>
+      {isFavorite ? (
+        <Icon.StarFilled style={{ color: C.primary6, width: 14, height: 14, flexShrink: 0 }} />
+      ) : (
+        <Icon.Star style={{ color: C.text4, width: 14, height: 14, flexShrink: 0 }} />
+      )}
+    </div>
+  );
+}
+
+function DefaultRow({ label, isDefault, onSetDefault }) {
+  return (
+    <div className="flex items-center justify-between border-b p-3" style={{ borderColor: C.line4 }}>
+      <span className="text-[13px] font-medium" style={{ color: C.text6 }}>
+        {label}
+      </span>
+      {isDefault ? (
+        <div className="rounded px-[10px] py-1" style={{ backgroundColor: C.bg6 }}>
+          <span className="text-[12px] font-medium" style={{ color: C.text6, letterSpacing: "0.12px" }}>
+            Default
+          </span>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onSetDefault}
+          className="clickable hov-soft rounded px-[10px] py-1"
+          style={{ border: `1px solid ${C.line5}` }}
+        >
+          <span className="text-[12px] font-medium" style={{ color: C.text6, letterSpacing: "0.12px" }}>
+            Set as Default
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function PersonalizationModal({ onClose }) {
+  const [defaultPage, setDefaultPage] = useState("Dashboard");
+  const defaultOptions = ["Dashboard", "My Portal", "My Approvals"];
+  const [selectedApp, setSelectedApp] = useState("Home");
+
+  return (
+    <div
+      className="absolute inset-0 flex items-start justify-start"
+      style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500 }}
+      onClick={onClose}
+    >
+      <div
+        className="flex flex-col overflow-hidden rounded"
+        style={{
+          width: 780,
+          maxWidth: "100%",
+          height: "calc(100% - 4px)",
+          backgroundColor: C.bg1,
+          marginLeft: 8,
+          marginTop: 4,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Title */}
+        <div className="flex flex-shrink-0 items-center justify-between border-b p-4" style={{ borderColor: C.line5 }}>
+          <p className="text-[18px] font-semibold" style={{ color: C.text7 }}>
+            Left Navigation Personalization
+          </p>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="clickable hov-soft flex items-center justify-center rounded p-2"
+              style={{ border: `1px solid ${C.line6}` }}
+            >
+              <span className="px-1 text-[14px] font-bold" style={{ color: C.text7 }}>
+                Cancel
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="clickable hov-primary-dark flex items-center justify-center rounded p-2"
+              style={{ backgroundColor: C.primary6, border: `1px solid ${C.primary6}` }}
+            >
+              <span className="px-1 text-[14px] font-bold text-white">Save Changes</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-1 items-start" style={{ minHeight: 0 }}>
+          {/* Left: reorder Favorites / All Apps */}
+          <div
+            className="sidebar-scroll flex h-full w-[280px] flex-col gap-1 overflow-y-auto border-r p-2"
+            style={{ borderColor: C.line5 }}
+          >
+            <div className="flex flex-col gap-2 px-2 pb-2 pt-4">
+              <div className="flex items-center gap-2 px-4 py-1 opacity-80">
+                <Icon.Star style={{ color: C.text4 }} />
+                <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
+                  Favorites
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                {FAVORITE_ITEMS.map((it) => (
+                  <DraggableAppRow
+                    key={it.label}
+                    label={it.label}
+                    Ico={it.icon}
+                    isFavorite
+                    isSelected={selectedApp === it.label}
+                    onSelect={() => setSelectedApp(it.label)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 px-2 pb-2 pt-4">
+              <div className="flex items-center gap-2 px-4 py-1 opacity-80">
+                <Icon.Grid style={{ color: C.text4 }} />
+                <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
+                  All Apps
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                {ALL_APPS_ITEMS.map((it) => (
+                  <DraggableAppRow
+                    key={it.label}
+                    label={it.label}
+                    Ico={it.icon}
+                    isSelected={selectedApp === it.label}
+                    onSelect={() => setSelectedApp(it.label)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: defaults + tip */}
+          <div className="flex flex-1 flex-col gap-3 p-4">
+            <div className="overflow-hidden rounded border" style={{ borderColor: C.line4 }}>
+              <div className="p-3" style={{ backgroundColor: C.bg4 }}>
+                <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
+                  Set Defaults
+                </span>
+              </div>
+              {defaultOptions.map((opt) => (
+                <DefaultRow key={opt} label={opt} isDefault={defaultPage === opt} onSetDefault={() => setDefaultPage(opt)} />
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-2 rounded p-3" style={{ backgroundColor: C.bg4 }}>
+              <span className="text-[11px] font-semibold uppercase" style={{ color: C.primary6, letterSpacing: "0.44px" }}>
+                Tip
+              </span>
+              <p className="text-[14px] leading-[22px]" style={{ color: C.text6 }}>
+                Drag and drop apps to reorder your navigation bar. Apps marked as favorites will appear in your top-level sidebar view.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SideNav({ onOpenPersonalization }) {
   const [openApps, setOpenApps] = useState({ Procurement: true });
   const [activeApp, setActiveApp] = useState("Procurement");
   const [activeChild, setActiveChild] = useState("Purchase Orders");
   const [collapsed, setCollapsed] = useState(false);
 
+  // Clicking an app header expands/collapses that app's own list.
+  // Non-active apps behave as a single-open accordion (opening one closes any
+  // other open non-active app); the active app's own open state is
+  // independent and is never touched by toggling a different, non-active app.
   const handleToggleApp = (label) => {
     setOpenApps((prev) => {
       const willOpen = !prev[label];
@@ -626,6 +890,8 @@ function SideNav() {
     });
   };
 
+  // Selecting an Aggregate makes its app the active one (hides its icon) and
+  // is the only action that closes whichever app was active before.
   const handleSelectChild = (app, child) => {
     setOpenApps((prev) => {
       const next = { ...prev, [app]: true };
@@ -640,7 +906,7 @@ function SideNav() {
 
   return (
     <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden ${collapsed ? "w-[56px]" : "w-[220px]"}`}
+      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[48px]" : "w-[220px]"}`}
       style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
     >
       {collapsed ? (
@@ -750,7 +1016,11 @@ function SideNav() {
           </div>
         ) : (
           <div key="expanded-footer" className="sidenav-fade flex items-center gap-1 rounded py-2 pl-3 pr-2" style={{ backgroundColor: C.bg6 }}>
-            <button className="clickable hov-soft-alt flex flex-1 items-center gap-1 rounded p-2">
+            <button
+              type="button"
+              onClick={onOpenPersonalization}
+              className="clickable hov-soft-alt flex flex-1 items-center gap-1 rounded p-2"
+            >
               <svg viewBox="0 0 14 14" width="14" height="14" style={{ color: C.text5 }}>
                 <path d="M2 3h10M2 7h10M2 11h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
               </svg>
@@ -774,9 +1044,11 @@ function SideNav() {
   );
 }
 
+/* ---------------- Assistant rail ---------------- */
+
 function Assistant() {
   return (
-    <div className="flex flex-shrink-0 flex-col self-stretch overflow-hidden w-[56px] items-center" style={{ backgroundColor: C.bg1 }}>
+    <div className="flex w-[56px] flex-shrink-0 flex-col items-center self-stretch" style={{ backgroundColor: C.bg1 }}>
       <div className="p-2">
         <button
           className="clickable hov-border-primary flex items-center rounded border p-[6px]"
@@ -1001,29 +1273,45 @@ function Pagination() {
   );
 }
 
+/* ---------------- Page ---------------- */
+
 export default function PurchaseOrdersPage() {
+  const [showPersonalization, setShowPersonalization] = useState(false);
+
   return (
     <div
-      className="flex h-screen w-full flex-col gap-1 text-[#0d0d0d]"
+      className="fixed inset-0 flex flex-col text-[#0d0d0d]"
       style={{ backgroundColor: C.bg6, fontFamily: "Inter, sans-serif", "--spacing": "0.25rem" }}
     >
       <HoverStyles />
       <TopBar />
-      <div className="flex flex-1 items-stretch gap-2 overflow-hidden">
-        <SideNav />
-        <div
-          className="flex flex-1 flex-col gap-2 overflow-auto px-[0px] py-[0px]"
-          style={{ backgroundColor: C.bg6 }}
-        >
-          <PageHeader />
-          <StatusStrip />
-          <div className="rounded" style={{ backgroundColor: C.bg1 }}>
-            <SectionHeader />
-            <Table />
-            <Pagination />
+      <div
+        className="flex-shrink-0"
+        style={{
+          height: 4,
+          backgroundColor: showPersonalization ? "rgba(0,0,0,0.16)" : "transparent",
+          transition: "background-color 150ms ease",
+        }}
+      />
+      <div className="flex flex-1 items-stretch overflow-hidden">
+        <SideNav onOpenPersonalization={() => setShowPersonalization(true)} />
+        <div className="relative flex flex-1 items-stretch gap-2 overflow-hidden pl-2">
+          <div
+            className="flex flex-1 flex-col gap-2 overflow-auto px-[16px] py-[14px]"
+            style={{ backgroundColor: C.bg6 }}
+          >
+            <PageHeader />
+            <StatusStrip />
+            <div className="rounded" style={{ backgroundColor: C.bg1 }}>
+              <SectionHeader />
+              <Table />
+              <Pagination />
+            </div>
           </div>
+          <Assistant />
+
+          {showPersonalization && <PersonalizationModal onClose={() => setShowPersonalization(false)} />}
         </div>
-        <Assistant />
       </div>
     </div>
   );
