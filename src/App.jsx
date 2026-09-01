@@ -906,7 +906,7 @@ function SideNav({ onOpenPersonalization }) {
 
   return (
     <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[48px]" : "w-[220px]"}`}
+      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[56px]" : "w-[220px]"}`}
       style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
     >
       {collapsed ? (
