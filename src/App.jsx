@@ -1297,7 +1297,7 @@ export default function PurchaseOrdersPage() {
         <SideNav onOpenPersonalization={() => setShowPersonalization(true)} />
         <div className="relative flex flex-1 items-stretch gap-2 overflow-hidden pl-2">
           <div
-            className="flex flex-1 flex-col gap-2 overflow-auto px-[16px] py-[14px]"
+            className="flex flex-1 flex-col gap-2 overflow-auto"
             style={{ backgroundColor: C.bg6 }}
           >
             <PageHeader />
