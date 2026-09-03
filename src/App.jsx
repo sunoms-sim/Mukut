@@ -224,39 +224,46 @@ const Icon = {
       <path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   ),
-  Grid: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-      <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none" />
-    </svg>
-  ),
-  ChevronLeft: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  ChevronRight: (p) => (
-    <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
-      <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  CollapseArrow: (p) => (
-    <svg viewBox="0 0 22 22" width="22" height="22" {...p}>
-      <path d="M13.5 6l-5.5 5 5.5 5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  ChartPie: (p) => (
+  Building: (p) => (
     <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <path d="M9 2a7 7 0 107 7H9z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-      <path d="M9 2v7" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="3" y="2" width="9" height="14" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path d="M12 7h3v9H3" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
+      <path d="M5.5 5h1M8.5 5h1M5.5 8h1M8.5 8h1M5.5 11h1M8.5 11h1" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   ),
-  Journal: (p) => (
+  HelpShield: (p) => (
     <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
-      <rect x="3" y="2" width="12" height="14" rx="1.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-      <path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path d="M7 7c0-1.1.9-2 2-2s2 .8 2 1.8c0 1.2-1.3 1.4-1.7 2.4-.1.3-.2.6-.2 1" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <circle cx="9" cy="13" r="0.15" fill="currentColor" stroke="currentColor" strokeWidth="1.3" />
+    </svg>
+  ),
+  Book2: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <path d="M9 4.5c-1.2-1-3-1.5-5-1.5v11c2 0 3.8.5 5 1.5 1.2-1 3-1.5 5-1.5V3c-2 0-3.8.5-5 1.5z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
+      <path d="M9 4.5V14" stroke="currentColor" strokeWidth="1.1" />
+    </svg>
+  ),
+  ChatQuestion: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <path d="M3 4.5h12v7.5H8l-3 3v-3H3z" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
+      <path d="M7.3 7.4c0-.9.7-1.6 1.7-1.6s1.7.6 1.7 1.4c0 .9-1 1-1.3 1.8" stroke="currentColor" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      <circle cx="9" cy="10.6" r="0.1" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  ),
+  AtSign: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <circle cx="9" cy="9" r="2.6" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      <path d="M11.6 9v1.2c0 1 .8 1.5 1.6 1.1.9-.5 1.3-1.6 1.3-2.7C14.5 5.9 12 4 9 4" stroke="currentColor" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+    </svg>
+  ),
+  Headset: (p) => (
+    <svg viewBox="0 0 24 24" width="24" height="24" {...p}>
+      <path d="M4 13v-1a8 8 0 0116 0v1" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+      <rect x="3" y="13" width="4" height="6" rx="1.4" stroke="currentColor" strokeWidth="1.3" fill="none" />
+      <rect x="17" y="13" width="4" height="6" rx="1.4" stroke="currentColor" strokeWidth="1.3" fill="none" />
+      <path d="M19 19.5v.5a3 3 0 01-3 3h-2.5" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
     </svg>
   ),
 };
@@ -288,6 +295,10 @@ const HoverStyles = () => (
     .collapsed-nav-item:hover .collapsed-flyout { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
     @keyframes sidenavFadeIn { from { opacity: 0; } to { opacity: 1; } }
     .sidenav-fade { animation: sidenavFadeIn 280ms ease; }
+    @keyframes personalizationBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes personalizationBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes personalizationPanelIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    @keyframes personalizationPanelOut { from { transform: translateX(0); } to { transform: translateX(-100%); } }
   `}</style>
 );
 
@@ -389,7 +400,67 @@ const STATUS_CARDS = [
   { label: "Overdue", count: "#2", amount: "$280.00", color: C.danger6 },
 ];
 
+const PREFERENCE_ITEMS = [
+  { label: "Scope Switch", icon: Icon.Building },
+  { label: "Help", icon: Icon.HelpShield },
+  { label: "Documents", icon: Icon.Book2 },
+  { label: "FAQ's", icon: Icon.ChatQuestion },
+  { label: "Send Email", icon: Icon.AtSign },
+];
+
+function ProfilePanel({ onClose }) {
+  return (
+    <>
+      <div className="fixed inset-0" style={{ zIndex: 998 }} onClick={onClose} />
+      <div className="absolute right-0 top-full mt-1 flex flex-col overflow-hidden rounded" style={{ width: 320, backgroundColor: C.bg1, boxShadow: "-16px 0px 80px 20px rgba(0,0,0,0.16)", zIndex: 999 }}>
+        <div className="flex flex-shrink-0 flex-col items-center gap-6 border-b p-4" style={{ borderColor: C.line4 }}>
+          <div className="flex w-full items-center justify-between">
+            <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Profile</span>
+            <button type="button" onClick={onClose} className="clickable flex items-center justify-center">
+              <span aria-hidden="true" style={{ color: C.text6, fontSize: 18, lineHeight: 1 }}>x</span>
+            </button>
+          </div>
+          <div className="flex w-full flex-col items-center gap-4 rounded p-2" style={{ backgroundColor: C.bg6 }}>
+            <div className="flex items-center justify-center rounded-full px-4 py-3" style={{ backgroundColor: C.primary4 }}>
+              <span className="text-[18px] font-semibold text-white">H</span>
+            </div>
+            <div className="flex flex-col items-center text-center" style={{ color: C.text6 }}>
+              <span className="text-[15px] font-semibold">Henry Cooper</span>
+              <span className="text-[12px]">Account Manager</span>
+            </div>
+            <a href="#" className="text-[14px] underline" style={{ color: C.primary6 }}>Manage Your Account</a>
+            <button type="button" className="clickable hov-soft rounded p-2" style={{ border: `1px solid ${C.line6}` }}>
+              <span className="px-1 text-[14px] font-bold" style={{ color: C.text7 }}>Sign Out</span>
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1 border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="px-[2px] pb-2 pt-1 text-[12px] font-medium uppercase" style={{ color: C.text5, letterSpacing: "0.24px" }}>Preferences</span>
+          {PREFERENCE_ITEMS.map((item) => (
+            <button key={item.label} type="button" className="clickable hov-soft flex w-full items-center gap-2 rounded px-2 py-3">
+              <item.icon style={{ width: 18, height: 18, color: C.text6, flexShrink: 0 }} />
+              <span className="text-[15px]" style={{ color: C.text6, letterSpacing: "0.15px" }}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-col p-4">
+          <div className="flex flex-col gap-3 rounded p-4" style={{ backgroundColor: C.bg6 }}>
+            <span className="text-center text-[11px] font-medium uppercase" style={{ color: C.text4, letterSpacing: "0.22px" }}>Useful Info</span>
+            <Icon.Headset style={{ width: 24, height: 24, color: C.text6 }} />
+            <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>Email: </span>mail@okovalo.com</p>
+            <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>USA: </span>+4125525155456</p>
+            <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>Canada: </span>+4125525155456</p>
+            <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>UK: </span>+4125525155456</p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function TopBar() {
+  const [showProfile, setShowProfile] = useState(false);
+
   return (
     <div className="flex h-[56px] items-center justify-between px-2" style={{ backgroundColor: C.bg1 }}>
       <div className="flex items-center">
@@ -422,7 +493,8 @@ function TopBar() {
         <button className="clickable hov-soft rounded p-2">
           <Icon.Settings style={{ color: C.text6 }} />
         </button>
-        <button className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5">
+        <div className="relative">
+        <button type="button" onClick={() => setShowProfile((state) => !state)} className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5">
           <Icon.User style={{ color: C.text6 }} />
           <span className="flex flex-col text-left">
             <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
@@ -433,6 +505,8 @@ function TopBar() {
             </span>
           </span>
         </button>
+        {showProfile && <ProfilePanel onClose={() => setShowProfile(false)} />}
+        </div>
       </div>
     </div>
   );
@@ -592,7 +666,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   const handleEnter = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top - 4, left: rect.left + 52 });
+      setPos({ top: rect.top - 4, left: rect.left + 42 });
     }
     setHovered(true);
   };
@@ -616,7 +690,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
           style={{
             position: "fixed",
             top: pos.top,
-            left: 52,
+            left: pos.left,
             paddingLeft: 8,
             paddingRight: 8,
             zIndex: 9999,
@@ -687,7 +761,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
 
 /* ---------------- Personalization modal ---------------- */
 
-function DraggableAppRow({ label, Ico, isFavorite, isSelected, onSelect }) {
+function DraggableAppRow({ label, Ico, isFavorite, isSelected, onSelect, onToggleFavorite }) {
   return (
     <div
       onClick={onSelect}
@@ -706,19 +780,18 @@ function DraggableAppRow({ label, Ico, isFavorite, isSelected, onSelect }) {
       >
         {label}
       </span>
-      {isFavorite ? (
-        <Icon.StarFilled style={{ color: C.primary6, width: 14, height: 14, flexShrink: 0 }} />
-      ) : (
-        <Icon.Star style={{ color: C.text4, width: 14, height: 14, flexShrink: 0 }} />
-      )}
+      <button type="button" aria-label={isFavorite ? `Remove ${label} from Favorites` : `Add ${label} to Favorites`} onClick={(event) => { event.stopPropagation(); onToggleFavorite(label); }} className="clickable hov-soft-alt flex flex-shrink-0 items-center justify-center rounded p-1">
+        {isFavorite ? <Icon.StarFilled style={{ color: C.primary6, width: 14, height: 14 }} /> : <Icon.Star style={{ color: C.text4, width: 14, height: 14 }} />}
+      </button>
     </div>
   );
 }
 
-function DefaultRow({ label, isDefault, onSetDefault }) {
+function DefaultRow({ label, isDefault, onSetDefault, isLast }) {
   return (
-    <div className="flex items-center justify-between border-b p-3" style={{ borderColor: C.line4 }}>
-      <span className="text-[13px] font-medium" style={{ color: C.text6 }}>
+    <div className="flex items-center justify-between p-3" style={!isLast ? { borderBottom: `1px solid ${C.line4}` } : undefined}>
+      <span className="flex items-center gap-2 text-[13px] font-medium" style={{ color: C.text6 }}>
+        <Icon.Grip style={{ color: C.text2, width: 14, height: 14, flexShrink: 0, cursor: "grab" }} />
         {label}
       </span>
       {isDefault ? (
@@ -744,25 +817,42 @@ function DefaultRow({ label, isDefault, onSetDefault }) {
 }
 
 function PersonalizationModal({ onClose }) {
-  const [defaultPage, setDefaultPage] = useState("Dashboard");
-  const defaultOptions = ["Dashboard", "My Portal", "My Approvals"];
   const [selectedApp, setSelectedApp] = useState("Home");
+  const [closing, setClosing] = useState(false);
+  const [apps, setApps] = useState(() => [
+    ...FAVORITE_ITEMS.map((item) => ({ ...item, favorite: true })),
+    ...ALL_APPS_ITEMS.map((item) => ({ ...item, favorite: false })),
+  ]);
+  const [defaultAggregate, setDefaultAggregate] = useState({ app: "Home", child: "Dashboard" });
+  const favoriteApps = apps.filter((app) => app.favorite);
+  const otherApps = apps.filter((app) => !app.favorite);
+  const selectedAppData = apps.find((app) => app.label === selectedApp);
+
+  const handleToggleFavorite = (label) => {
+    setApps((previous) => previous.map((app) => (app.label === label ? { ...app, favorite: !app.favorite } : app)));
+  };
+
+  const requestClose = () => {
+    setClosing(true);
+    setTimeout(onClose, 500);
+  };
 
   return (
     <div
       className="absolute inset-0 flex items-start justify-start"
-      style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500 }}
-      onClick={onClose}
+      style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }}
+      onClick={requestClose}
     >
       <div
         className="flex flex-col overflow-hidden rounded"
         style={{
           width: 780,
           maxWidth: "100%",
-          height: "calc(100% - 4px)",
+          height: "100%",
           backgroundColor: C.bg1,
-          marginLeft: 8,
-          marginTop: 4,
+          marginLeft: 4,
+          marginTop: 0,
+          animation: `${closing ? "personalizationPanelOut" : "personalizationPanelIn"} 500ms ease forwards`,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -774,7 +864,7 @@ function PersonalizationModal({ onClose }) {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               className="clickable hov-soft flex items-center justify-center rounded p-2"
               style={{ border: `1px solid ${C.line6}` }}
             >
@@ -784,7 +874,7 @@ function PersonalizationModal({ onClose }) {
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               className="clickable hov-primary-dark flex items-center justify-center rounded p-2"
               style={{ backgroundColor: C.primary6, border: `1px solid ${C.primary6}` }}
             >
@@ -808,7 +898,7 @@ function PersonalizationModal({ onClose }) {
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                {FAVORITE_ITEMS.map((it) => (
+                {favoriteApps.map((it) => (
                   <DraggableAppRow
                     key={it.label}
                     label={it.label}
@@ -816,6 +906,7 @@ function PersonalizationModal({ onClose }) {
                     isFavorite
                     isSelected={selectedApp === it.label}
                     onSelect={() => setSelectedApp(it.label)}
+                    onToggleFavorite={handleToggleFavorite}
                   />
                 ))}
               </div>
@@ -829,31 +920,36 @@ function PersonalizationModal({ onClose }) {
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                {ALL_APPS_ITEMS.map((it) => (
+                {otherApps.map((it) => (
                   <DraggableAppRow
                     key={it.label}
                     label={it.label}
                     Ico={it.icon}
                     isSelected={selectedApp === it.label}
                     onSelect={() => setSelectedApp(it.label)}
+                    onToggleFavorite={handleToggleFavorite}
                   />
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Right: defaults + tip */}
-          <div className="flex flex-1 flex-col gap-3 p-4">
-            <div className="overflow-hidden rounded border" style={{ borderColor: C.line4 }}>
-              <div className="p-3" style={{ backgroundColor: C.bg4 }}>
-                <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>
-                  Set Defaults
-                </span>
+          {/* Right: aggregates for the selected app + tip */}
+          <div className="sidebar-scroll flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+            {selectedAppData && selectedAppData.children.length > 0 && (
+              <div className="overflow-hidden rounded border" style={{ borderColor: C.line4 }}>
+                <div className="p-3" style={{ backgroundColor: C.bg4 }}>
+                  <span className="text-[11px] font-semibold uppercase" style={{ color: C.text4, letterSpacing: "0.44px" }}>{selectedAppData.label} Aggregates</span>
+                </div>
+                {selectedAppData.children.map((child, index) => selectedAppData.favorite ? (
+                  <DefaultRow key={child} label={child} isLast={index === selectedAppData.children.length - 1} isDefault={defaultAggregate.app === selectedAppData.label && defaultAggregate.child === child} onSetDefault={() => setDefaultAggregate({ app: selectedAppData.label, child })} />
+                ) : (
+                  <div key={child} className="p-3" style={index < selectedAppData.children.length - 1 ? { borderBottom: `1px solid ${C.line4}` } : undefined}>
+                    <span className="text-[13px] font-medium" style={{ color: C.text6 }}>{child}</span>
+                  </div>
+                ))}
               </div>
-              {defaultOptions.map((opt) => (
-                <DefaultRow key={opt} label={opt} isDefault={defaultPage === opt} onSetDefault={() => setDefaultPage(opt)} />
-              ))}
-            </div>
+            )}
 
             <div className="flex flex-col gap-2 rounded p-3" style={{ backgroundColor: C.bg4 }}>
               <span className="text-[11px] font-semibold uppercase" style={{ color: C.primary6, letterSpacing: "0.44px" }}>
@@ -861,6 +957,8 @@ function PersonalizationModal({ onClose }) {
               </span>
               <p className="text-[14px] leading-[22px]" style={{ color: C.text6 }}>
                 Drag and drop apps to reorder your navigation bar. Apps marked as favorites will appear in your top-level sidebar view.
+                <br />
+                Removing an app from Favorites will reset it to the default view.
               </p>
             </div>
           </div>
