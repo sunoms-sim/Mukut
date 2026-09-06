@@ -297,6 +297,8 @@ const HoverStyles = () => (
     .sidenav-fade { animation: sidenavFadeIn 280ms ease; }
     @keyframes personalizationBackdropIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes personalizationBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes profilePanelIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes profilePanelOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
     @keyframes personalizationPanelIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
     @keyframes personalizationPanelOut { from { transform: translateX(0); } to { transform: translateX(-100%); } }
   `}</style>
@@ -408,11 +410,74 @@ const PREFERENCE_ITEMS = [
   { label: "Send Email", icon: Icon.AtSign },
 ];
 
-function ProfilePanel({ onClose }) {
+const SETTINGS_PREFERENCE_ITEMS = [
+  { label: "View All Setting", icon: Icon.Settings },
+  { label: "Accessibility", icon: Icon.Accessibility },
+  { label: "Keyboard Shortcut", icon: Icon.Keyboard },
+];
+
+const SETTINGS_OPTIONS = {
+  Appearance: ["Light Mode", "Dark Mode", "System Default"],
+  Density: ["Standard", "Comfort", "Compact"],
+  Themes: ["Minimal", "Classic", "Cool"],
+  "Accent Color": ["Red", "Green", "Blue", "More"],
+};
+
+function SettingsPanel({ onRequestClose, closing }) {
+  const [selections, setSelections] = useState({
+    Appearance: "Light Mode",
+    Density: "Standard",
+    Themes: "Classic",
+    "Accent Color": "Blue",
+  });
+
+  return (
+    <div
+      className="absolute inset-0 flex items-start justify-end"
+      style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }}
+      onClick={onRequestClose}
+    >
+      <div
+        className="sidebar-scroll flex h-full flex-col overflow-y-auto rounded"
+        style={{ width: 350, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex flex-shrink-0 items-center justify-between border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Quick Setting</span>
+          <button type="button" onClick={onRequestClose} className="clickable"><Icon.Close style={{ width: 14, height: 14, color: C.text6 }} /></button>
+        </div>
+        <div className="flex flex-col gap-1 border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="px-[2px] pb-2 pt-1 text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Preferences</span>
+          {SETTINGS_PREFERENCE_ITEMS.map((item) => (
+            <button key={item.label} type="button" className="clickable hov-soft flex w-full items-center gap-2 rounded px-2 py-3">
+              <item.icon style={{ width: 18, height: 18, color: C.text6 }} />
+              <span className="text-[15px]" style={{ color: C.text6 }}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+        {Object.entries(SETTINGS_OPTIONS).map(([section, options]) => (
+          <div key={section} className="flex flex-col gap-3 border-b p-4" style={{ borderColor: C.line4 }}>
+            <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>{section}</span>
+            {options.map((option) => (
+              <button key={option} type="button" onClick={() => setSelections((current) => ({ ...current, [section]: option }))} className="clickable hov-soft flex items-center gap-2 rounded px-2 py-2 text-left">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full" style={{ border: `1.5px solid ${selections[section] === option ? C.primary6 : C.line6}` }}>
+                  {selections[section] === option && <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: C.primary6 }} />}
+                </span>
+                <span className="text-[14px]" style={{ color: C.text6 }}>{option}</span>
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProfilePanel({ onClose, closing }) {
   return (
     <>
-      <div className="fixed inset-0" style={{ zIndex: 998 }} onClick={onClose} />
-      <div className="absolute right-0 top-full mt-1 flex flex-col overflow-hidden rounded" style={{ width: 320, backgroundColor: C.bg1, boxShadow: "-16px 0px 80px 20px rgba(0,0,0,0.16)", zIndex: 999 }}>
+      <div className="fixed inset-0" style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 998, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }} onClick={onClose} />
+      <div className="fixed right-0 top-0 flex h-full flex-col overflow-hidden rounded" style={{ width: 320, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, boxShadow: "-16px 0px 80px 20px rgba(0,0,0,0.16)", zIndex: 999, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}>
         <div className="flex flex-shrink-0 flex-col items-center gap-6 border-b p-4" style={{ borderColor: C.line4 }}>
           <div className="flex w-full items-center justify-between">
             <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Profile</span>
@@ -458,9 +523,7 @@ function ProfilePanel({ onClose }) {
   );
 }
 
-function TopBar() {
-  const [showProfile, setShowProfile] = useState(false);
-
+function TopBar({ onToggleProfile, isProfileOpen, onToggleSettings, isSettingsOpen }) {
   return (
     <div className="flex h-[56px] items-center justify-between px-2" style={{ backgroundColor: C.bg1 }}>
       <div className="flex items-center">
@@ -490,11 +553,11 @@ function TopBar() {
         <button className="clickable hov-soft rounded p-2">
           <Icon.Bell style={{ color: C.text6 }} />
         </button>
-        <button className="clickable hov-soft rounded p-2">
+        <button type="button" onClick={onToggleSettings} className="clickable hov-soft rounded p-2" style={{ backgroundColor: isSettingsOpen ? C.bg6 : "transparent" }}>
           <Icon.Settings style={{ color: C.text6 }} />
         </button>
         <div className="relative">
-        <button type="button" onClick={() => setShowProfile((state) => !state)} className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5">
+        <button type="button" onClick={onToggleProfile} className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5" style={{ backgroundColor: isProfileOpen ? C.bg6 : "transparent" }}>
           <Icon.User style={{ color: C.text6 }} />
           <span className="flex flex-col text-left">
             <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
@@ -505,7 +568,6 @@ function TopBar() {
             </span>
           </span>
         </button>
-        {showProfile && <ProfilePanel onClose={() => setShowProfile(false)} />}
         </div>
       </div>
     </div>
@@ -1375,6 +1437,26 @@ function Pagination() {
 
 export default function PurchaseOrdersPage() {
   const [showPersonalization, setShowPersonalization] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileClosing, setProfileClosing] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsClosing, setSettingsClosing] = useState(false);
+
+  const closeProfile = () => {
+    setProfileClosing(true);
+    setTimeout(() => {
+      setShowProfile(false);
+      setProfileClosing(false);
+    }, 500);
+  };
+
+  const closeSettings = () => {
+    setSettingsClosing(true);
+    setTimeout(() => {
+      setShowSettings(false);
+      setSettingsClosing(false);
+    }, 500);
+  };
 
   return (
     <div
@@ -1382,12 +1464,17 @@ export default function PurchaseOrdersPage() {
       style={{ backgroundColor: C.bg6, fontFamily: "Inter, sans-serif", "--spacing": "0.25rem" }}
     >
       <HoverStyles />
-      <TopBar />
+      <TopBar
+        onToggleProfile={() => (showProfile ? closeProfile() : setShowProfile(true))}
+        isProfileOpen={showProfile}
+        onToggleSettings={() => (showSettings ? closeSettings() : setShowSettings(true))}
+        isSettingsOpen={showSettings}
+      />
       <div
         className="flex-shrink-0"
         style={{
           height: 4,
-          backgroundColor: showPersonalization ? "rgba(0,0,0,0.16)" : "transparent",
+          backgroundColor: showPersonalization || showProfile || showSettings ? "rgba(0,0,0,0.16)" : "transparent",
           transition: "background-color 150ms ease",
         }}
       />
@@ -1410,6 +1497,8 @@ export default function PurchaseOrdersPage() {
 
           {showPersonalization && <PersonalizationModal onClose={() => setShowPersonalization(false)} />}
         </div>
+        {showProfile && <ProfilePanel onClose={closeProfile} closing={profileClosing} />}
+        {showSettings && <SettingsPanel onRequestClose={closeSettings} closing={settingsClosing} />}
       </div>
     </div>
   );
