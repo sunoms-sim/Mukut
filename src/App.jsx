@@ -416,20 +416,81 @@ const SETTINGS_PREFERENCE_ITEMS = [
   { label: "Keyboard Shortcut", icon: Icon.Keyboard },
 ];
 
-const SETTINGS_OPTIONS = {
-  Appearance: ["Light Mode", "Dark Mode", "System Default"],
-  Density: ["Standard", "Comfort", "Compact"],
-  Themes: ["Minimal", "Classic", "Cool"],
-  "Accent Color": ["Red", "Green", "Blue", "More"],
-};
+const APPEARANCE_OPTIONS = [
+  { label: "Light Mode", bg: C.bg6, bar: C.bg1, dots: [C.primary6, C.primary6, C.primary6] },
+  { label: "Dark Mode", bg: "#000000", bar: "#1f2937", dots: [C.primary6, C.primary6, C.primary6] },
+  { label: "System Default", split: true },
+];
+
+const DENSITY_OPTIONS = [
+  { label: "Standard", bg: C.bg4, bar: C.bg1, dots: [C.primary6, C.primary6, C.primary6] },
+  { label: "Comfort", bg: C.bg4, bar: C.bg1, dots: [C.primary6, C.primary6] },
+  { label: "Compact", bg: C.bg4, bar: C.bg1, dots: [C.primary6, C.primary6, C.primary6, C.primary6] },
+];
+
+const THEME_OPTIONS = [
+  { label: "Minimal", bg: C.bg4, bar: C.bg1, dots: [C.bg1, C.bg1, C.bg1] },
+  { label: "Classic", bg: "#f4f5f8", bar: "#ffffff", dots: ["#03a459", "#03a459", "#03a459"] },
+  { label: "Cool", bg: "#f4f5f8", bar: "#e0f2fe", dots: ["#03a459", "#dc2626", "#f59e0b"] },
+];
+
+const ACCENT_OPTIONS = [
+  { label: "Red", bg: "#f4f5f8", bar: "#ffffff", dots: ["#dc2626", "#dc2626", "#dc2626"] },
+  { label: "Green", bg: "#f4f5f8", bar: "#ffffff", dots: ["#03a459", "#03a459", "#03a459"] },
+  { label: "Blue", bg: "#f4f5f8", bar: "#ffffff", dots: [C.primary6, C.primary6, C.primary6] },
+  { label: "More" },
+];
+
+function MiniPreview({ bg, bar, dots = [], split }) {
+  if (split) {
+    return (
+      <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 46, border: `0.5px solid ${C.line4}`, opacity: 0.85 }}>
+        <div className="absolute inset-0" style={{ backgroundColor: "#ffffff", clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
+        <div className="absolute inset-0" style={{ backgroundColor: "#000000", clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 46, backgroundColor: bg, border: `0.5px solid ${C.line4}`, opacity: 0.85 }}>
+      <div className="absolute rounded-sm" style={{ left: 3, top: 5, width: 94, height: 10, backgroundColor: bar }} />
+      <div className="absolute rounded-sm" style={{ left: 3, top: 18, width: 26, height: 23, backgroundColor: bar }} />
+      <div className="absolute flex flex-col gap-[3px]" style={{ left: 32, top: 19 }}>
+        <div className="rounded-sm" style={{ width: 55, height: 5, backgroundColor: bar }} />
+        <div className="rounded-sm" style={{ width: 55, height: 5, backgroundColor: bar }} />
+        <div className="rounded-sm" style={{ width: 55, height: 5, backgroundColor: bar }} />
+      </div>
+      <div className="absolute flex flex-col gap-[2px]" style={{ left: 6, bottom: 4, opacity: 0.6 }}>
+        {dots.map((color, index) => <div key={index} className="rounded-sm" style={{ width: 5, height: 5, backgroundColor: color }} />)}
+      </div>
+    </div>
+  );
+}
+
+function SettingsRadioRow({ label, checked, onSelect, preview }) {
+  return (
+    <div className="flex w-full items-start justify-between">
+      <button type="button" onClick={onSelect} className="clickable flex items-center gap-2">
+        <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${checked ? C.primary6 : C.line6}` }}>
+          {checked && <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: C.primary6 }} />}
+        </span>
+        <span className="text-[14px] leading-[22px]" style={{ color: C.text6 }}>{label}</span>
+      </button>
+      {preview ? <MiniPreview {...preview} /> : (
+        <button type="button" className="clickable hov-soft flex w-[100px] items-center gap-2 rounded px-4 py-2" style={{ border: `1px solid ${C.line6}` }}>
+          <span className="flex-1 text-left text-[14px]" style={{ color: C.text6 }}>Select</span>
+          <Icon.ChevronDown style={{ width: 14, height: 14, color: C.text6 }} />
+        </button>
+      )}
+    </div>
+  );
+}
 
 function SettingsPanel({ onRequestClose, closing }) {
-  const [selections, setSelections] = useState({
-    Appearance: "Light Mode",
-    Density: "Standard",
-    Themes: "Classic",
-    "Accent Color": "Blue",
-  });
+  const [appearance, setAppearance] = useState("Light Mode");
+  const [density, setDensity] = useState("Standard");
+  const [theme, setTheme] = useState("Classic");
+  const [accent, setAccent] = useState("Blue");
 
   return (
     <div
@@ -438,7 +499,7 @@ function SettingsPanel({ onRequestClose, closing }) {
       onClick={onRequestClose}
     >
       <div
-        className="sidebar-scroll flex h-full flex-col overflow-y-auto rounded"
+        className="flex h-full flex-col overflow-hidden rounded"
         style={{ width: 350, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}
         onClick={(event) => event.stopPropagation()}
       >
@@ -446,6 +507,7 @@ function SettingsPanel({ onRequestClose, closing }) {
           <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Quick Setting</span>
           <button type="button" onClick={onRequestClose} className="clickable"><Icon.Close style={{ width: 14, height: 14, color: C.text6 }} /></button>
         </div>
+        <div className="sidebar-scroll flex flex-1 flex-col overflow-y-auto">
         <div className="flex flex-col gap-1 border-b p-4" style={{ borderColor: C.line4 }}>
           <span className="px-[2px] pb-2 pt-1 text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Preferences</span>
           {SETTINGS_PREFERENCE_ITEMS.map((item) => (
@@ -455,19 +517,23 @@ function SettingsPanel({ onRequestClose, closing }) {
             </button>
           ))}
         </div>
-        {Object.entries(SETTINGS_OPTIONS).map(([section, options]) => (
-          <div key={section} className="flex flex-col gap-3 border-b p-4" style={{ borderColor: C.line4 }}>
-            <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>{section}</span>
-            {options.map((option) => (
-              <button key={option} type="button" onClick={() => setSelections((current) => ({ ...current, [section]: option }))} className="clickable hov-soft flex items-center gap-2 rounded px-2 py-2 text-left">
-                <span className="flex h-4 w-4 items-center justify-center rounded-full" style={{ border: `1.5px solid ${selections[section] === option ? C.primary6 : C.line6}` }}>
-                  {selections[section] === option && <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: C.primary6 }} />}
-                </span>
-                <span className="text-[14px]" style={{ color: C.text6 }}>{option}</span>
-              </button>
-            ))}
-          </div>
-        ))}
+        <div className="flex flex-col gap-4 border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Appearance</span>
+          {APPEARANCE_OPTIONS.map((option) => <SettingsRadioRow key={option.label} label={option.label} checked={appearance === option.label} onSelect={() => setAppearance(option.label)} preview={option} />)}
+        </div>
+        <div className="flex flex-col gap-4 border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Density</span>
+          {DENSITY_OPTIONS.map((option) => <SettingsRadioRow key={option.label} label={option.label} checked={density === option.label} onSelect={() => setDensity(option.label)} preview={option} />)}
+        </div>
+        <div className="flex flex-col gap-4 border-b p-4" style={{ borderColor: C.line4 }}>
+          <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Themes</span>
+          {THEME_OPTIONS.map((option) => <SettingsRadioRow key={option.label} label={option.label} checked={theme === option.label} onSelect={() => setTheme(option.label)} preview={option} />)}
+        </div>
+        <div className="flex flex-col gap-4 p-4">
+          <span className="px-[2px] text-[12px] font-medium uppercase" style={{ color: C.text5 }}>Accent Color</span>
+          {ACCENT_OPTIONS.map((option) => <SettingsRadioRow key={option.label} label={option.label} checked={accent === option.label} onSelect={() => setAccent(option.label)} preview={option.label === "More" ? null : option} />)}
+        </div>
+        </div>
       </div>
     </div>
   );
@@ -476,13 +542,13 @@ function SettingsPanel({ onRequestClose, closing }) {
 function ProfilePanel({ onClose, closing }) {
   return (
     <>
-      <div className="fixed inset-0" style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 998, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }} onClick={onClose} />
-      <div className="fixed right-0 top-0 flex h-full flex-col overflow-hidden rounded" style={{ width: 320, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, boxShadow: "-16px 0px 80px 20px rgba(0,0,0,0.16)", zIndex: 999, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}>
+      <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }} onClick={onClose} />
+      <div className="absolute right-0 top-0 flex h-full flex-col overflow-hidden rounded" style={{ width: 350, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, zIndex: 500, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}>
         <div className="flex flex-shrink-0 flex-col items-center gap-6 border-b p-4" style={{ borderColor: C.line4 }}>
           <div className="flex w-full items-center justify-between">
             <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Profile</span>
             <button type="button" onClick={onClose} className="clickable flex items-center justify-center">
-              <span aria-hidden="true" style={{ color: C.text6, fontSize: 18, lineHeight: 1 }}>x</span>
+              <Icon.Close style={{ width: 14, height: 14, color: C.text6 }} />
             </button>
           </div>
           <div className="flex w-full flex-col items-center gap-4 rounded p-2" style={{ backgroundColor: C.bg6 }}>
@@ -499,6 +565,7 @@ function ProfilePanel({ onClose, closing }) {
             </button>
           </div>
         </div>
+        <div className="sidebar-scroll flex flex-1 flex-col overflow-y-auto">
         <div className="flex flex-col gap-1 border-b p-4" style={{ borderColor: C.line4 }}>
           <span className="px-[2px] pb-2 pt-1 text-[12px] font-medium uppercase" style={{ color: C.text5, letterSpacing: "0.24px" }}>Preferences</span>
           {PREFERENCE_ITEMS.map((item) => (
@@ -510,13 +577,16 @@ function ProfilePanel({ onClose, closing }) {
         </div>
         <div className="flex flex-col p-4">
           <div className="flex flex-col gap-3 rounded p-4" style={{ backgroundColor: C.bg6 }}>
-            <span className="text-center text-[11px] font-medium uppercase" style={{ color: C.text4, letterSpacing: "0.22px" }}>Useful Info</span>
-            <Icon.Headset style={{ width: 24, height: 24, color: C.text6 }} />
+            <span className="text-left text-[11px] font-medium uppercase" style={{ color: C.text4, letterSpacing: "0.22px" }}>Useful Info</span>
+            <div className="flex items-center justify-center rounded p-2" style={{ backgroundColor: C.bg4 }}>
+              <Icon.Headset style={{ width: 24, height: 24, color: C.text6 }} />
+            </div>
             <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>Email: </span>mail@okovalo.com</p>
             <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>USA: </span>+4125525155456</p>
             <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>Canada: </span>+4125525155456</p>
             <p className="text-[12px]" style={{ color: C.text6 }}><span className="font-medium" style={{ color: C.text4 }}>UK: </span>+4125525155456</p>
           </div>
+        </div>
         </div>
       </div>
     </>
@@ -557,15 +627,10 @@ function TopBar({ onToggleProfile, isProfileOpen, onToggleSettings, isSettingsOp
           <Icon.Settings style={{ color: C.text6 }} />
         </button>
         <div className="relative">
-        <button type="button" onClick={onToggleProfile} className="clickable hov-soft flex items-center gap-2 rounded px-1 py-0.5" style={{ backgroundColor: isProfileOpen ? C.bg6 : "transparent" }}>
+        <button type="button" onClick={onToggleProfile} className="clickable hov-soft flex items-center gap-2 rounded px-2 py-2" style={{ backgroundColor: isProfileOpen ? C.bg6 : "transparent" }}>
           <Icon.User style={{ color: C.text6 }} />
-          <span className="flex flex-col text-left">
-            <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
-              Mr. Henry
-            </span>
-            <span className="text-[12px]" style={{ color: C.text4, letterSpacing: "0.12px" }}>
-              Account Manager
-            </span>
+          <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
+            Mr. Henry
           </span>
         </button>
         </div>
@@ -728,7 +793,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   const handleEnter = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top - 4, left: rect.left + 42 });
+      setPos({ top: rect.top - 4, left: rect.left + 46 });
     }
     setHovered(true);
   };
@@ -1066,7 +1131,7 @@ function SideNav({ onOpenPersonalization }) {
 
   return (
     <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[56px]" : "w-[220px]"}`}
+      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[48px]" : "w-[220px]"}`}
       style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
     >
       {collapsed ? (
@@ -1482,7 +1547,7 @@ export default function PurchaseOrdersPage() {
         <SideNav onOpenPersonalization={() => setShowPersonalization(true)} />
         <div className="relative flex flex-1 items-stretch gap-2 overflow-hidden pl-2">
           <div
-            className="flex flex-1 flex-col gap-2 overflow-auto"
+            className="flex flex-1 flex-col gap-2 overflow-auto px-[16px] py-[14px]"
             style={{ backgroundColor: C.bg6 }}
           >
             <PageHeader />
