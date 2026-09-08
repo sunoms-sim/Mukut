@@ -81,10 +81,10 @@ const Icon = {
         d="M10 2a5 5 0 00-5 5v2.5c0 .8-.3 1.6-.9 2.2L3 13h14l-1.1-1.3a3 3 0 01-.9-2.2V7a5 5 0 00-5-5z"
         stroke="currentColor"
         strokeWidth="1.3"
-        fill="none"
+        fill="rgb(107, 114, 128)"
         strokeLinejoin="round"
       />
-      <path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.3" fill="none" />
+      <path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.3" fill="rgb(107, 114, 128)" />
     </svg>
   ),
   Settings: (p) => (
@@ -93,16 +93,16 @@ const Icon = {
         d="M8.2 2.5h3.6l.4 1.9c.4.15.77.34 1.12.57l1.83-.63 1.8 3.12-1.46 1.28c.03.2.05.4.05.61s-.02.41-.05.61l1.46 1.28-1.8 3.12-1.83-.63c-.35.23-.72.42-1.12.57l-.4 1.9H8.2l-.4-1.9a5.9 5.9 0 01-1.12-.57l-1.83.63-1.8-3.12 1.46-1.28A4.9 4.9 0 014.46 10c0-.21.02-.41.05-.61L3.05 8.11l1.8-3.12 1.83.63c.35-.23.72-.42 1.12-.57z"
         stroke="currentColor"
         strokeWidth="1.15"
-        fill="none"
+        fill="rgb(107, 114, 128)"
         strokeLinejoin="round"
       />
-      <circle cx="10" cy="10" r="2.4" stroke="currentColor" strokeWidth="1.15" fill="none" />
+      <circle cx="10" cy="10" r="2.4" stroke="currentColor" strokeWidth="1.15" fill="white" />
     </svg>
   ),
   User: (p) => (
     <svg viewBox="0 0 20 20" width="20" height="20" {...p}>
-      <circle cx="10" cy="7" r="3.2" stroke="currentColor" strokeWidth="1.3" fill="none" />
-      <path d="M3.5 17c1-3 4-4.5 6.5-4.5s5.5 1.5 6.5 4.5" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+      <circle cx="10" cy="7" r="3.2" stroke="currentColor" strokeWidth="1.3" fill="rgb(107, 114, 128)" />
+      <path d="M3.5 17c1-3 4-4.5 6.5-4.5s5.5 1.5 6.5 4.5" stroke="currentColor" strokeWidth="1.3" fill="rgb(107, 114, 128)" strokeLinecap="round" />
     </svg>
   ),
   Home: (p) => (
@@ -211,6 +211,18 @@ const Icon = {
       <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
+  Envelope: (p) => (
+    <svg viewBox="0 0 16 16" width="14" height="14" {...p}>
+      <rect x="1.5" y="3" width="13" height="10" rx="1.2" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path d="M2 4l6 5 6-5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  EnvelopeFilled: (p) => (
+    <svg viewBox="0 0 16 16" width="14" height="14" {...p}>
+      <rect x="1.5" y="3" width="13" height="10" rx="1.2" fill="currentColor" />
+      <path d="M2 4l6 5 6-5" stroke="white" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
   Sliders: (p) => (
     <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
       <path d="M2 3h10M2 7h10M2 11h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -222,6 +234,19 @@ const Icon = {
   StarFilled: (p) => (
     <svg viewBox="0 0 14 14" width="14" height="14" {...p}>
       <path d="M7 1l1.8 3.7L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.6z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  ),
+  Accessibility: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <circle cx="9" cy="6.2" r="1.2" fill="currentColor" />
+      <path d="M9 8v4.5M6.2 9.8h5.6M7.2 15l1.8-2 1.8 2" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Keyboard: (p) => (
+    <svg viewBox="0 0 18 18" width="18" height="18" {...p}>
+      <rect x="2" y="5" width="14" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path d="M4.5 8h.01M7 8h.01M9.5 8h.01M12 8h.01M13.5 8h.01M4.5 11h9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   ),
   Building: (p) => (
@@ -274,6 +299,7 @@ const HoverStyles = () => (
     *, *::before, *::after { box-sizing: border-box; }
     button { border: none; background: none; font: inherit; }
     .hov-soft:hover { background-color: ${C.bg6} !important; }
+    .topbar-icon-btn:hover svg, .topbar-icon-btn:hover span { color: ${C.text6} !important; }
     .hov-soft-alt:hover { background-color: ${C.bg8} !important; }
     .hov-border-primary:hover { border-color: ${C.primary6} !important; }
     .hov-primary-dark:hover { background-color: #3f4be0 !important; border-color: #3f4be0 !important; }
@@ -486,6 +512,108 @@ function SettingsRadioRow({ label, checked, onSelect, preview }) {
   );
 }
 
+const NOTIFICATION_GROUPS = [
+  {
+    label: "Monday, Jun 23",
+    items: [
+      { title: "Invoice #1042", desc: "Invoice #1042 from Acme Corp is awaiting your approval...", unread: true },
+      { title: "Welcome, Alex!", desc: "We're excited to have you on board. Here's everything you need...", unread: true },
+      { title: "May report ready", desc: "The analytics report for May is now available to download...", unread: false },
+      { title: "Password reset", desc: "A password reset was requested for your account. If this wasn't...", unread: false },
+    ],
+  },
+  {
+    label: "Yesterday",
+    items: [
+      { title: "Payment Confirmed", desc: "Your payment of $1,240.00 for Invoice #INV-2045 has been...", unread: false },
+      { title: "Invoice Overdue", desc: "Invoice #INV-2038 for $850.00 was due Jun 18. Please re...", unread: false },
+      { title: "Statement Available", desc: "Your June account statement is now available to view and...", unread: false },
+      { title: "Subscription Renewed", desc: "Your Pro plan has been successfully renewed. Next billing...", unread: false },
+      { title: "Refund Processed", desc: "A refund of $320.00 has been issued to your original pay...", unread: false },
+    ],
+  },
+];
+
+function NotificationRow({ title, desc, unread }) {
+  return (
+    <div className="clickable hov-soft flex w-full items-start gap-2 rounded px-2 py-1">
+      <div className="flex flex-shrink-0 items-center pt-1">
+        {unread ? <Icon.EnvelopeFilled style={{ color: C.primary6 }} /> : <Icon.Envelope style={{ color: C.text5 }} />}
+      </div>
+      <div className="flex flex-1 flex-col gap-[2px] text-[14px] leading-[22px]">
+        <p className="font-bold" style={{ color: unread ? C.text6 : C.text5 }}>{title}</p>
+        <p style={{ color: C.text5 }}>{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function NotificationsPanel({ onRequestClose, closing }) {
+  const [tab, setTab] = useState("All");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("View All");
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    if (!filterOpen) return undefined;
+    const handleOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) setFilterOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [filterOpen]);
+
+  return (
+    <div
+      className="absolute inset-0 flex items-start justify-end"
+      style={{ backgroundColor: "rgba(0,0,0,0.16)", zIndex: 500, animation: `${closing ? "personalizationBackdropOut" : "personalizationBackdropIn"} 450ms ease forwards` }}
+      onClick={onRequestClose}
+    >
+      <div
+        className="flex h-full flex-col overflow-hidden rounded"
+        style={{ width: 350, maxWidth: "100%", marginRight: 4, backgroundColor: C.bg1, animation: `${closing ? "profilePanelOut" : "profilePanelIn"} 500ms ease forwards` }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex flex-shrink-0 flex-col gap-6 border-b p-4" style={{ borderColor: C.line5 }}>
+          <div className="flex w-full items-center justify-between">
+            <div className="relative" ref={filterRef}>
+              <button type="button" onClick={() => setFilterOpen((open) => !open)} className="clickable hov-soft flex items-center gap-2 rounded p-1">
+                <span className="text-[15px] font-semibold" style={{ color: C.text5 }}>Notifications</span>
+                <Icon.Filter style={{ width: 16, height: 16, color: C.text5 }} />
+              </button>
+              {filterOpen && (
+                <div className="absolute left-0 top-full z-10 mt-1 w-full overflow-hidden rounded" style={{ backgroundColor: C.bg1, border: `1px solid ${C.line5}`, boxShadow: "0px 4px 16px rgba(0,0,0,0.12)" }}>
+                  {["View Unread", "View Archive", "View All"].map((option) => (
+                    <button key={option} type="button" onClick={() => { setActiveFilter(option); setFilterOpen(false); }} className="clickable hov-soft flex w-full items-center px-3 py-2 text-left" style={{ backgroundColor: activeFilter === option ? C.bg6 : "transparent" }}>
+                      <span className="whitespace-nowrap text-[14px]" style={{ color: C.text6 }}>{option}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button type="button" onClick={onRequestClose} className="clickable flex items-center justify-center"><Icon.Close style={{ width: 14, height: 14, color: C.text6 }} /></button>
+          </div>
+          <div className="flex w-full items-center rounded" style={{ backgroundColor: C.bg6 }}>
+            {["All", "Inbox"].map((option) => (
+              <button key={option} type="button" onClick={() => setTab(option)} className="flex flex-1 items-center justify-center rounded p-2" style={tab === option ? { backgroundColor: C.bg1, border: `1px solid ${C.line4}` } : { border: "1px solid transparent" }}>
+                <span className="text-[14px]" style={{ color: tab === option ? C.text6 : C.text5 }}>{option}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="sidebar-scroll flex flex-1 flex-col overflow-y-auto">
+          {NOTIFICATION_GROUPS.map((group, groupIndex) => (
+            <div key={group.label} className="flex flex-col gap-4 p-4" style={groupIndex !== NOTIFICATION_GROUPS.length - 1 ? { borderBottom: `1px solid ${C.line5}` } : undefined}>
+              <span className="px-[2px] pt-2 text-[12px] font-medium" style={{ color: C.text5, letterSpacing: "0.24px" }}>{group.label}</span>
+              {group.items.map((item) => <NotificationRow key={item.title} {...item} />)}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SettingsPanel({ onRequestClose, closing }) {
   const [appearance, setAppearance] = useState("Light Mode");
   const [density, setDensity] = useState("Standard");
@@ -552,7 +680,7 @@ function ProfilePanel({ onClose, closing }) {
             </button>
           </div>
           <div className="flex w-full flex-col items-center gap-4 rounded p-2" style={{ backgroundColor: C.bg6 }}>
-            <div className="flex items-center justify-center rounded-full px-4 py-3" style={{ backgroundColor: C.primary4 }}>
+            <div className="flex items-center justify-center rounded-full px-5 py-3" style={{ backgroundColor: C.primary4 }}>
               <span className="text-[18px] font-semibold text-white">H</span>
             </div>
             <div className="flex flex-col items-center text-center" style={{ color: C.text6 }}>
@@ -593,7 +721,7 @@ function ProfilePanel({ onClose, closing }) {
   );
 }
 
-function TopBar({ onToggleProfile, isProfileOpen, onToggleSettings, isSettingsOpen }) {
+function TopBar({ onToggleProfile, isProfileOpen, onToggleSettings, isSettingsOpen, onToggleNotifications, isNotificationsOpen }) {
   return (
     <div className="flex h-[56px] items-center justify-between px-2" style={{ backgroundColor: C.bg1 }}>
       <div className="flex items-center">
@@ -619,17 +747,17 @@ function TopBar({ onToggleProfile, isProfileOpen, onToggleSettings, isSettingsOp
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-1 w-[403px]">
-        <button className="clickable hov-soft rounded p-2">
-          <Icon.Bell style={{ color: C.text6 }} />
+      <div className="flex w-[403px] items-center justify-end gap-0">
+        <button type="button" onClick={onToggleNotifications} className="clickable hov-soft topbar-icon-btn rounded p-2" style={{ backgroundColor: isNotificationsOpen ? C.bg6 : "transparent" }}>
+          <Icon.Bell style={{ color: isNotificationsOpen ? C.text6 : C.text4, width: 24, height: 24 }} />
         </button>
-        <button type="button" onClick={onToggleSettings} className="clickable hov-soft rounded p-2" style={{ backgroundColor: isSettingsOpen ? C.bg6 : "transparent" }}>
-          <Icon.Settings style={{ color: C.text6 }} />
+        <button type="button" onClick={onToggleSettings} className="clickable hov-soft topbar-icon-btn rounded p-2" style={{ backgroundColor: isSettingsOpen ? C.bg6 : "transparent" }}>
+          <Icon.Settings style={{ color: isSettingsOpen ? C.text6 : C.text4, width: 24, height: 24 }} />
         </button>
         <div className="relative">
-        <button type="button" onClick={onToggleProfile} className="clickable hov-soft flex items-center gap-2 rounded px-2 py-2" style={{ backgroundColor: isProfileOpen ? C.bg6 : "transparent" }}>
-          <Icon.User style={{ color: C.text6 }} />
-          <span className="text-[14px]" style={{ color: C.text6, letterSpacing: "0.28px" }}>
+        <button type="button" onClick={onToggleProfile} className="clickable hov-soft topbar-icon-btn flex items-center gap-2 rounded px-2 py-2" style={{ backgroundColor: isProfileOpen ? C.bg6 : "transparent" }}>
+          <Icon.User style={{ color: isProfileOpen ? C.text6 : C.text4, width: 24, height: 24 }} />
+          <span className="text-[14px] font-bold" style={{ color: isProfileOpen ? C.text6 : C.text4, letterSpacing: "0.28px" }}>
             Mr. Henry
           </span>
         </button>
@@ -793,7 +921,7 @@ function CollapsedNavItem({ label, Ico, children, activeChild, onSelectChild }) 
   const handleEnter = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.top - 4, left: rect.left + 46 });
+      setPos({ top: rect.top - 4, left: rect.left + 44 });
     }
     setHovered(true);
   };
@@ -1131,7 +1259,7 @@ function SideNav({ onOpenPersonalization }) {
 
   return (
     <div
-      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[48px]" : "w-[220px]"}`}
+      className={`flex flex-shrink-0 flex-col self-stretch overflow-hidden rounded-tr-[4px] ${collapsed ? "w-[56px]" : "w-[220px]"}`}
       style={{ backgroundColor: C.bg1, transition: "width 320ms ease" }}
     >
       {collapsed ? (
@@ -1506,6 +1634,8 @@ export default function PurchaseOrdersPage() {
   const [profileClosing, setProfileClosing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsClosing, setSettingsClosing] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsClosing, setNotificationsClosing] = useState(false);
 
   const closeProfile = () => {
     setProfileClosing(true);
@@ -1523,6 +1653,14 @@ export default function PurchaseOrdersPage() {
     }, 500);
   };
 
+  const closeNotifications = () => {
+    setNotificationsClosing(true);
+    setTimeout(() => {
+      setShowNotifications(false);
+      setNotificationsClosing(false);
+    }, 500);
+  };
+
   return (
     <div
       className="fixed inset-0 flex flex-col text-[#0d0d0d]"
@@ -1534,20 +1672,22 @@ export default function PurchaseOrdersPage() {
         isProfileOpen={showProfile}
         onToggleSettings={() => (showSettings ? closeSettings() : setShowSettings(true))}
         isSettingsOpen={showSettings}
+        onToggleNotifications={() => (showNotifications ? closeNotifications() : setShowNotifications(true))}
+        isNotificationsOpen={showNotifications}
       />
       <div
         className="flex-shrink-0"
         style={{
           height: 4,
-          backgroundColor: showPersonalization || showProfile || showSettings ? "rgba(0,0,0,0.16)" : "transparent",
+          backgroundColor: showPersonalization || showProfile || showSettings || showNotifications ? "rgba(0,0,0,0.16)" : "transparent",
           transition: "background-color 150ms ease",
         }}
       />
-      <div className="flex flex-1 items-stretch overflow-hidden">
+      <div className="relative flex flex-1 items-stretch overflow-hidden">
         <SideNav onOpenPersonalization={() => setShowPersonalization(true)} />
         <div className="relative flex flex-1 items-stretch gap-2 overflow-hidden pl-2">
           <div
-            className="flex flex-1 flex-col gap-2 overflow-auto px-[16px] py-[14px]"
+            className="flex flex-1 flex-col gap-2 overflow-auto"
             style={{ backgroundColor: C.bg6 }}
           >
             <PageHeader />
@@ -1564,6 +1704,7 @@ export default function PurchaseOrdersPage() {
         </div>
         {showProfile && <ProfilePanel onClose={closeProfile} closing={profileClosing} />}
         {showSettings && <SettingsPanel onRequestClose={closeSettings} closing={settingsClosing} />}
+        {showNotifications && <NotificationsPanel onRequestClose={closeNotifications} closing={notificationsClosing} />}
       </div>
     </div>
   );
